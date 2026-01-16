@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>あまりのあるわり算プリント</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; margin: 20px; line-height: 1.6; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button { padding: 8px 12px; cursor: pointer; }
+    input[type="number"] { width: 70px; padding: 6px; }
+    .sheet { max-width: 900px; margin: 0 auto; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; margin-top: 16px; }
+    .q { border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
+    .q .n { font-weight: 700; margin-right: 6px; }
+    .meta { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .score { font-weight: 700; margin-top: 10px; }
+    .muted { color: #666; font-size: 0.9em; }
+    .ok { background: #e9ffe9; }
+    .ng { background: #ffe9e9; }
+    .answers { margin-top: 18px; border-top: 2px dashed #ccc; padding-top: 14px; display: none; }
+    @media print {
+      .no-print { display: none !important; }
+      body { margin: 0; }
+      .q { break-inside: avoid; }
+      .answers { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="no-print row" style="justify-content: space-between;">
+      <div class="row">
+        <button id="makeBtn">問題を作る</button>
+        <button id="checkBtn">答え合わせ</button>
+        <button id="toggleAnsBtn">答えを見る</button>
+        <button id="printBtn">印刷する</button>
+      </div>
+      <div class="muted">⚠️ 数字は半角で入力してね</div>
+    </div>
+
+    <h1>3年生 算数 あまりのある わり算</h1>
+
+    <div class="meta">
+      <div>年：_____　組：_____</div>
+      <div>名前：________________</div>
+    </div>
+
+    <div class="score" id="score">点数：— / 100</div>
+    <div class="muted">※ □の中に数字を入れて、「答え合わせ」ボタンを押してね。</div>
+
+    <div class="grid" id="qs"></div>
+
+    <div class="answers" id="answers">
+      <h2>【解答】</h2>
+      <div id="ansList"></div>
+    </div>
+  </div>
+
+<script>
+  // ---- 設定 ----
+  const QUESTION_COUNT = 20;   // 20問で1問5点 → 100点
+  const DIV_MIN = 2;
+  const DIV_MAX = 9;
+  const Q_MIN = 2;
+  const Q_MAX = 9;
+
+  // 問題データ {a, b, q, r} : a ÷ b = q あまり r
+  let problems = [];
+
+  const elQs = document.getElementById("qs");
+  const elScore = document.getElementById("score");
+  const elAnswers = document.getElementById("answers");
+  const elAnsList = document.getElementById("ansList");
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function generateProblems() {
+    const set = new Set();
+    const out = [];
+
+    while (out.length < QUESTION_COUNT) {
+      const b = randInt(DIV_MIN, DIV_MAX);
+      const q = randInt(Q_MIN, Q_MAX);
+      const r = randInt(1, b - 1);   // あまりは 1〜b-1
+      const a = b * q + r;
+
+      const key = `${a}/${b}`;
+      if (set.has(key)) continue;
+      set.add(key);
+      out.push({ a, b, q, r });
+    }
+    return out;
+  }
+
+  function render() {
+    elQs.innerHTML = "";
+    problems.forEach((p, i) => {
+      const div = document.createElement("div");
+      div.className = "q";
+      div.innerHTML = `
+        <div>
+          <span class="n">${i + 1}.</span>
+          ${p.a} ÷ ${p.b} ＝ 
+          <span>□</span>
+          <input type="number" inputmode="numeric" min="0" class="ansQ" aria-label="商 ${i+1}">
+          あまり
+          <span>□</span>
+          <input type="number" inputmode="numeric" min="0" class="ansR" aria-label="あまり ${i+1}">
+        </div>
+        <div class="muted" style="margin-top:6px;">
+          （商とあまりを答える）
+        </div>
+      `;
+      elQs.appendChild(div);
+    });
+
+    // 解答欄
+    elAnsList.innerHTML = problems.map((p, i) =>
+      `<div>${i + 1}. ${p.a} ÷ ${p.b} = ${p.q} あまり ${p.r}</div>`
+    ).join("");
+
+    elScore.textContent = "点数：— / 100";
+    elAnswers.style.display = "none";
+  }
+
+  function check() {
+    const qs = Array.from(document.querySelectorAll(".q"));
+    const pointPer = 100 / QUESTION_COUNT;
+    let score = 0;
+
+    qs.forEach((box, i) => {
+      const qIn = box.querySelector(".ansQ");
+      const rIn = box.querySelector(".ansR");
+      const userQ = Number(qIn.value);
+      const userR = Number(rIn.value);
+      const ok = (userQ === problems[i].q) && (userR === problems[i].r);
+
+      box.classList.remove("ok", "ng");
+      box.classList.add(ok ? "ok" : "ng");
+      if (ok) score += pointPer;
+    });
+
+    elScore.textContent = `点数：${Math.round(score)} / 100`;
+  }
+
+  document.getElementById("makeBtn").addEventListener("click", () => {
+    problems = generateProblems();
+    render();
+  });
+  document.getElementById("checkBtn").addEventListener("click", check);
+  document.getElementById("toggleAnsBtn").addEventListener("click", () => {
+    elAnswers.style.display = (elAnswers.style.display === "none") ? "block" : "none";
+  });
+  document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+  // 初期表示
+  problems = generateProblems();
+  render();
+</script>
+</body>
+</html>
