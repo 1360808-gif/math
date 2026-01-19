@@ -23,11 +23,10 @@ body{
 }
 .wrap{ max-width:1200px; margin:16px auto; padding:0 12px 40px; }
 
-/* ===== レイアウト：左(タイトル+問題) / 右(手書き) =====
-   左カラムの右端を固定し、余った幅は右が広がる */
+/* 左：タイトル+問題 / 右：手書き */
 .layout{
   display:grid;
-  grid-template-columns: minmax(560px, 760px) 1fr; /* 左は一定範囲 / 右は可変 */
+  grid-template-columns: minmax(560px, 760px) 1fr;
   gap:12px;
   align-items:start;
 }
@@ -120,8 +119,16 @@ button:active{ transform: translateY(1px); }
   font-weight:1000;
 }
 
-/* 入力＋〇 */
-.answerBox{ position:relative; display:inline-block; flex:none; }
+/* 入力欄コンテナ */
+.answerBox{
+  position:relative;
+  display:inline-block;
+  flex:none;
+  /* 重要：overflowを見えるようにして、丸が欠けないようにする */
+  overflow:visible;
+}
+
+/* 入力欄 */
 .answerBox input{
   width:54px;
   padding:6px 6px;
@@ -131,10 +138,10 @@ button:active{ transform: translateY(1px); }
   border:2px solid var(--line);
   background:#fff;
   position:relative;
-  z-index:1;
+  z-index:1; /* 入力欄は下 */
 }
 
-/* 半角注意メッセージ（全角入力時に一時表示） */
+/* 半角注意メッセージ */
 .hankakuWarn{
   position:absolute;
   top:-26px;
@@ -149,25 +156,29 @@ button:active{ transform: translateY(1px); }
   white-space:nowrap;
   box-shadow:0 4px 8px rgba(0,0,0,.12);
   display:none;
-  z-index:5;
+  z-index:20;
 }
 .answerBox.warn .hankakuWarn{ display:block; }
 
-/* 〇（中心一致・最前面） */
-.circle{
+/* ✅ 丸：最前面（手書きっぽく上から） */
+.mark{
   position:absolute;
-  width:38px;
-  height:38px;
-  border:4px solid rgba(239,68,68,0.65);
-  border-radius:50%;
   top:50%;
   left:50%;
+  width:46px;
+  height:46px;
+  border:4px solid rgba(239,68,68,0.7);
+  border-radius:50%;
   transform:translate(-50%, -50%);
   pointer-events:none;
   display:none;
-  z-index:6;
+
+  /* ここが肝：すべてより上 */
+  z-index:9999;
 }
-.answerBox.ok .circle{ display:block; }
+
+/* 正解したら表示 */
+.answerBox.ok .mark{ display:block; }
 
 /* 押してる間の答え表示中 */
 .answerBox.revealing input{ background:#f8fafc; }
@@ -211,7 +222,7 @@ button:active{ transform: translateY(1px); }
   font-size:18px;
 }
 
-/* ===== 手書き ===== */
+/* 手書き */
 .boardHeader{
   display:flex;
   align-items:center;
@@ -265,7 +276,6 @@ button:active{ transform: translateY(1px); }
 
   <div class="layout">
 
-    <!-- 左カラム：タイトル＋問題（右端を揃える） -->
     <div class="leftCol">
       <div class="top">
         <h1>あまりのある わり算（3年生）</h1>
@@ -286,7 +296,6 @@ button:active{ transform: translateY(1px); }
       </div>
     </div>
 
-    <!-- 右カラム：手書き（余った幅で広がる） -->
     <div class="panel">
       <div class="boardHeader">
         <div class="boardTitle">✍ 手書き計算スペース</div>
@@ -304,12 +313,10 @@ button:active{ transform: translateY(1px); }
       <div class="boardHint">※ 指でも書けます。消しゴムは「消しゴム」ボタンで切り替え。</div>
     </div>
 
-  </div><!-- /layout -->
-
+  </div>
 </div>
 
 <script>
-/* 全角→半角（数字のみ） */
 function toHalfWidth(str){
   return str.replace(/[０-９]/g, s =>
     String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
@@ -319,7 +326,6 @@ function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-/* 問題生成 */
 let problems=[];
 const QNUM=10;
 function makeProblems(){
@@ -349,7 +355,7 @@ function render(){
           <span class="answerBox qBox">
             <span class="hankakuWarn">半角数字で入力してね</span>
             <input class="ansQ" inputmode="numeric" aria-label="商 ${idx+1}">
-            <span class="circle"></span>
+            <span class="mark" aria-hidden="true"></span>
           </span>
 
           <span class="remLabel">あまり</span>
@@ -357,7 +363,7 @@ function render(){
           <span class="answerBox rBox">
             <span class="hankakuWarn">半角数字で入力してね</span>
             <input class="ansR" inputmode="numeric" aria-label="あまり ${idx+1}">
-            <span class="circle"></span>
+            <span class="mark" aria-hidden="true"></span>
           </span>
         </div>
 
@@ -375,7 +381,6 @@ function render(){
     const rBox = d.querySelector(".rBox");
     const holdBtn = d.querySelector(".holdAnsBtn");
 
-    // 入力：全角→半角 ＋ 全角が混じってたら注意表示
     [qInput, rInput].forEach(inp=>{
       inp.addEventListener("input",(e)=>{
         const box = e.target.parentElement;
@@ -426,23 +431,19 @@ function render(){
       rBox.classList.remove("revealing");
     }
 
-    // マウス
     holdBtn.addEventListener("mousedown", (e)=>{ e.preventDefault(); showAnswer(); });
     window.addEventListener("mouseup", hideAnswer);
 
-    // タッチ
     holdBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); showAnswer(); }, {passive:false});
     holdBtn.addEventListener("touchend", (e)=>{ e.preventDefault(); hideAnswer(); }, {passive:false});
     holdBtn.addEventListener("touchcancel", hideAnswer);
 
-    // ふいに外れた時の保険
     holdBtn.addEventListener("mouseleave", hideAnswer);
   });
 
   document.getElementById("score").textContent="点数：— / 100";
 }
 
-/* こたえあわせ */
 function check(){
   let score=0;
   document.querySelectorAll(".q").forEach((card,i)=>{
