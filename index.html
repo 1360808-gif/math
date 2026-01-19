@@ -8,7 +8,6 @@
 <style>
 :root{
   --bg:#f7f8ff;
-  --card:#ffffff;
   --ink:#1f2937;
   --line:#e5e7eb;
   --accent:#4f46e5;
@@ -33,7 +32,6 @@ body{
 }
 h1{ margin:0 0 8px; font-size:22px; }
 
-/* ボタン配置：左端と右端に分ける */
 .controlsRow{
   display:flex;
   align-items:center;
@@ -47,7 +45,6 @@ h1{ margin:0 0 8px; font-size:22px; }
   align-items:center;
   flex-wrap:wrap;
 }
-
 button{
   padding:9px 12px;
   border-radius:12px;
@@ -95,33 +92,40 @@ button:active{ transform: translateY(1px); }
   background:#fff;
   border:1px solid var(--line);
   border-radius:18px;
-  padding:14px;
+  padding:12px;
   box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
-/* 1問の中身：左＝式、右＝答えボタン */
+/* === 1行に収めるための行レイアウト === */
 .qRow{
-  display:grid;
-  grid-template-columns: 1fr auto;
-  gap:10px;
-  align-items:start;
-}
-
-.line{
   display:flex;
   align-items:center;
-  flex-wrap:wrap;
-  gap:8px;
-  font-size:20px;
-  font-weight:900;
+  gap:10px;
 }
 
-/* 入力欄＋〇 */
-.answerBox{ position:relative; display:inline-block; }
-.answerBox input{
-  width:64px;
-  padding:6px;
+/* 左側：式＋解答欄（折り返しさせない） */
+.qInline{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1;
+  min-width:0;
+  white-space:nowrap;   /* 折り返し防止 */
+  overflow:hidden;
+}
+
+/* 数式部分 */
+.expr{
   font-size:18px;
+  font-weight:1000;
+}
+
+/* 入力＋〇 */
+.answerBox{ position:relative; display:inline-block; flex:none; }
+.answerBox input{
+  width:54px;                 /* 少し細く */
+  padding:6px 6px;
+  font-size:17px;
   text-align:center;
   border-radius:10px;
   border:2px solid var(--line);
@@ -131,8 +135,8 @@ button:active{ transform: translateY(1px); }
 }
 .circle{
   position:absolute;
-  width:40px;
-  height:40px;
+  width:38px;
+  height:38px;
   border:4px solid rgba(239,68,68,0.65);
   border-radius:50%;
   top:50%;
@@ -144,31 +148,43 @@ button:active{ transform: translateY(1px); }
 }
 .answerBox.ok .circle{ display:block; }
 
-/* 各問題の右端ボタン */
-.qActions{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  align-items:stretch;
-  min-width:130px;
-}
-.qActions button{
-  width:130px;
-  white-space:nowrap;
+/* あまりラベル */
+.remLabel{
+  font-size:14px;
+  font-weight:1000;
+  opacity:.85;
 }
 
-/* 答え表示（右側/または式の下に出る） */
-.ansReveal{
-  margin-top:8px;
+/* 右端：アイコンボタン（省スペース） */
+.iconBtn{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#fff;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  cursor:pointer;
+  flex:none;
+}
+.iconBtn:active{ transform: translateY(1px); }
+
+/* 答え表示：1行の右側に小さく（押したときだけ） */
+.ansTiny{
   display:none;
+  margin-left:8px;
+  font-size:14px;
   font-weight:1000;
   color:#111827;
-  background:#f8fafc;
-  border:1px dashed #cbd5e1;
-  border-radius:12px;
-  padding:8px 10px;
+  opacity:.9;
 }
-.ansReveal.show{ display:block; }
+.ansTiny.show{ display:inline; }
+
+/* もし本当に幅が足りない環境だけ、折り返し許可（保険） */
+@media(max-width:360px){
+  .qInline{ white-space:normal; }
+}
 
 .score{
   margin-top:14px;
@@ -233,12 +249,9 @@ button:active{ transform: translateY(1px); }
 
     <div class="controlsRow">
       <div class="controlsLeft">
-        <!-- 左端：こたえあわせ -->
         <button class="primary" id="checkBtn">こたえあわせ</button>
       </div>
-
       <div class="controlsRight">
-        <!-- 右端：問題をつくる（離す） -->
         <button id="makeBtn">もんだいをつくる</button>
       </div>
     </div>
@@ -312,26 +325,26 @@ function render(){
     d.className="q";
     d.innerHTML=`
       <div class="qRow">
-        <div class="qMain">
-          <div class="line">
-            ${p.a} ÷ ${p.b} ＝
-            <span class="answerBox">
-              <input class="ansQ" inputmode="numeric" aria-label="商 ${idx+1}">
-              <span class="circle"></span>
-            </span>
-            <span>あまり</span>
-            <span class="answerBox">
-              <input class="ansR" inputmode="numeric" aria-label="あまり ${idx+1}">
-              <span class="circle"></span>
-            </span>
-          </div>
+        <div class="qInline">
+          <span class="expr">${p.a} ÷ ${p.b} ＝</span>
 
-          <div class="ansReveal" aria-live="polite"></div>
+          <span class="answerBox">
+            <input class="ansQ" inputmode="numeric" aria-label="商 ${idx+1}">
+            <span class="circle"></span>
+          </span>
+
+          <span class="remLabel">あまり</span>
+
+          <span class="answerBox">
+            <input class="ansR" inputmode="numeric" aria-label="あまり ${idx+1}">
+            <span class="circle"></span>
+          </span>
+
+          <span class="ansTiny" aria-live="polite"></span>
         </div>
 
-        <div class="qActions">
-          <button class="toggleAnsBtn" type="button">こたえを見る</button>
-        </div>
+        <!-- アイコンボタン：👁（表示）/ 🙈（非表示） -->
+        <button class="iconBtn toggleAnsBtn" type="button" aria-label="こたえを見る">👁</button>
       </div>
     `;
     qs.appendChild(d);
@@ -343,19 +356,21 @@ function render(){
       });
     });
 
-    // こたえを見る/かくす
+    // こたえ表示切り替え
     const btn = d.querySelector(".toggleAnsBtn");
-    const ans = d.querySelector(".ansReveal");
+    const ans = d.querySelector(".ansTiny");
     btn.addEventListener("click", ()=>{
       const showing = ans.classList.contains("show");
       if(showing){
         ans.classList.remove("show");
         ans.textContent = "";
-        btn.textContent = "こたえを見る";
+        btn.textContent = "👁";
+        btn.setAttribute("aria-label","こたえを見る");
       }else{
-        ans.textContent = `こたえ： ${p.q} あまり ${p.r}`;
+        ans.textContent = `= ${p.q} あまり ${p.r}`;
         ans.classList.add("show");
-        btn.textContent = "こたえをかくす";
+        btn.textContent = "🙈";
+        btn.setAttribute("aria-label","こたえをかくす");
       }
     });
   });
@@ -395,13 +410,12 @@ const ctx = canvas.getContext("2d");
 
 let drawing = false;
 let lastX = 0, lastY = 0;
-let mode = "pen"; // pen | eraser
+let mode = "pen";
 
 function resizeCanvas(){
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
 
-  // 退避
   const old = document.createElement("canvas");
   old.width = canvas.width;
   old.height = canvas.height;
