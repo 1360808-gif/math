@@ -1,185 +1,185 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>あまりのあるわり算プリント（3年生）</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>あまりのある わり算（3年生）</title>
 
-  <style>
-    :root{
-      --bg:#f7f8ff;
-      --card:#ffffff;
-      --ink:#1f2937;
-      --muted:#6b7280;
-      --line:#e5e7eb;
-      --good:#16a34a;
-      --bad:#dc2626;
-      --accent:#4f46e5;
-      --shadow:0 10px 24px rgba(0,0,0,.08);
-      --radius:18px;
-    }
-    *{ box-sizing:border-box; }
+<style>
+:root{
+  --bg:#f7f8ff;
+  --card:#ffffff;
+  --ink:#1f2937;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --good:#16a34a;
+  --bad:#dc2626;
+  --accent:#4f46e5;
+  --shadow:0 10px 24px rgba(0,0,0,.08);
+  --radius:18px;
+}
+*{ box-sizing:border-box; }
 
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-    }
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
+.wrap{ max-width:980px; margin:16px auto; padding:0 12px 40px; }
 
-    .wrap{ max-width:980px; margin:16px auto; padding:0 12px 40px; }
+.top{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:14px;
+  box-shadow:var(--shadow);
+}
+h1{ margin:0 0 6px; font-size:22px; }
 
-    .top{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:14px;
-      box-shadow:var(--shadow);
-    }
+.controls button{
+  margin:4px 4px 0 0;
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  font-weight:900;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+}
+.controls .secondary{
+  background:#fff;
+  color:var(--ink);
+  border:1px solid var(--line);
+}
 
-    h1{ margin:0 0 6px; font-size:22px; }
+.mascot{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+}
+.cat{
+  font-size:36px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+}
+.bubble{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+  font-weight:900;
+}
 
-    .controls button{
-      margin:4px 4px 0 0;
-      padding:8px 12px;
-      border-radius:12px;
-      border:none;
-      font-weight:900;
-      background:var(--accent);
-      color:#fff;
-      cursor:pointer;
-    }
-    .controls .secondary{
-      background:#fff;
-      color:var(--ink);
-      border:1px solid var(--line);
-    }
+.mission{
+  margin-top:10px;
+  background:#ecfeff;
+  border:1px solid #67e8f9;
+  border-radius:14px;
+  padding:10px;
+  font-weight:900;
+}
 
-    .mascot{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-top:10px;
-    }
-    .cat{
-      font-size:36px;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:10px;
-    }
-    .bubble{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:10px;
-      font-weight:900;
-    }
+.grid{
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+@media(max-width:700px){
+  .grid{ grid-template-columns:1fr; }
+}
 
-    .mission{
-      margin-top:10px;
-      background:#ecfeff;
-      border:1px solid #67e8f9;
-      border-radius:14px;
-      padding:10px;
-      font-weight:900;
-    }
+.q{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 6px 12px rgba(0,0,0,.06);
+}
 
-    .grid{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-    }
-    @media(max-width:700px){
-      .grid{ grid-template-columns:1fr; }
-    }
+.line{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  font-size:20px;
+  font-weight:900;
+}
 
-    .q{
-      position:relative;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-      box-shadow:0 6px 12px rgba(0,0,0,.06);
-    }
+/* 入力＋赤丸を重ねる箱 */
+.answerBox{
+  position:relative;
+  display:inline-block;
+}
 
-    /* 赤丸 */
-    .maru{
-      position:absolute;
-      top:-10px;
-      right:-10px;
-      width:42px;
-      height:42px;
-      border-radius:50%;
-      border:4px solid #ef4444;
-      color:#ef4444;
-      font-weight:1000;
-      font-size:20px;
-      display:grid;
-      place-items:center;
-      background:#fff;
-      transform:rotate(-10deg);
-      display:none;
-    }
-    .q.ok .maru{ display:grid; }
+.answerBox input{
+  width:64px;
+  padding:6px;
+  font-size:18px;
+  text-align:center;
+  border-radius:10px;
+  border:2px solid var(--line);
+  background:#fff;
+  position:relative;
+  z-index:1;
+}
 
-    /* === 式と回答を横並び === */
-    .line{
-      display:flex;
-      align-items:center;
-      flex-wrap:wrap;
-      gap:8px;
-      font-size:20px;
-      font-weight:900;
-    }
+/* 半透明の赤丸 */
+.circle{
+  position:absolute;
+  inset:-6px;
+  border:4px solid rgba(239,68,68,0.6);
+  border-radius:50%;
+  pointer-events:none;
+  display:none;
+  transform:rotate(-12deg);
+}
 
-    .line input{
-      width:64px;
-      padding:6px;
-      font-size:18px;
-      text-align:center;
-      border-radius:10px;
-      border:2px solid var(--line);
-    }
+.answerBox.ok .circle{
+  display:block;
+}
 
-    .status{
-      margin-top:6px;
-      font-weight:900;
-    }
-    .q.ok .status{ color:var(--good); }
-    .q.ng .status{ color:var(--bad); }
+.status{
+  margin-top:6px;
+  font-weight:900;
+}
+.q.ok .status{ color:var(--good); }
+.q.ng .status{ color:var(--bad); }
 
-    .score{
-      margin-top:14px;
-      font-weight:1000;
-      font-size:18px;
-    }
-  </style>
+.score{
+  margin-top:14px;
+  font-weight:1000;
+  font-size:18px;
+}
+</style>
 </head>
 
 <body>
 <div class="wrap">
 
-  <div class="top">
-    <h1>あまりのある わり算（3年生）</h1>
+<div class="top">
+  <h1>あまりのある わり算（3年生）</h1>
 
-    <div class="controls">
-      <button id="makeBtn">もんだいをつくる</button>
-      <button class="secondary" id="checkBtn">こたえあわせ</button>
-    </div>
-
-    <div class="mascot">
-      <div class="cat" id="cat">🐱</div>
-      <div class="bubble" id="catMsg">きょうも がんばろう！</div>
-    </div>
-
-    <div class="mission" id="mission"></div>
+  <div class="controls">
+    <button id="makeBtn">もんだいをつくる</button>
+    <button class="secondary" id="checkBtn">こたえあわせ</button>
   </div>
 
-  <div class="grid" id="qs"></div>
+  <div class="mascot">
+    <div class="cat" id="cat">🐱</div>
+    <div class="bubble" id="catMsg">きょうも がんばろう！</div>
+  </div>
 
-  <div class="score" id="score">点数：— / 100</div>
+  <div class="mission" id="mission"></div>
+</div>
+
+<div class="grid" id="qs"></div>
+
+<div class="score" id="score">点数：— / 100</div>
 
 </div>
 
@@ -205,7 +205,7 @@ document.getElementById("mission").textContent =
   "🐾 きょうのミッション： " +
   missions[new Date().getDate() % missions.length];
 
-/* 問題 */
+/* 問題生成 */
 let problems=[];
 const QNUM=10;
 
@@ -228,20 +228,22 @@ function makeProblems(){
 function render(){
   const qs=document.getElementById("qs");
   qs.innerHTML="";
-  problems.forEach((p,i)=>{
+  problems.forEach((p)=>{
     const d=document.createElement("div");
     d.className="q";
     d.innerHTML=`
-      <div class="maru">⭕</div>
-
       <div class="line">
         ${p.a} ÷ ${p.b} ＝
-        <span>しょう</span>
-        <input class="ansQ">
+        <span class="answerBox">
+          <input class="ansQ">
+          <span class="circle"></span>
+        </span>
         <span>あまり</span>
-        <input class="ansR">
+        <span class="answerBox">
+          <input class="ansR">
+          <span class="circle"></span>
+        </span>
       </div>
-
       <div class="status">まだ</div>
     `;
     qs.appendChild(d);
@@ -261,17 +263,29 @@ function render(){
 function check(){
   const cards=document.querySelectorAll(".q");
   let score=0;
+
   cards.forEach((card,i)=>{
+    const qBox=card.querySelector(".ansQ").parentElement;
+    const rBox=card.querySelector(".ansR").parentElement;
+    qBox.classList.remove("ok");
+    rBox.classList.remove("ok");
+
     const uq=Number(card.querySelector(".ansQ").value);
     const ur=Number(card.querySelector(".ansR").value);
-    const ok=(uq===problems[i].q && ur===problems[i].r);
 
+    const okQ = uq===problems[i].q;
+    const okR = ur===problems[i].r;
+
+    if(okQ) qBox.classList.add("ok");
+    if(okR) rBox.classList.add("ok");
+
+    const okAll = okQ && okR;
     card.classList.remove("ok","ng");
-    card.classList.add(ok?"ok":"ng");
+    card.classList.add(okAll?"ok":"ng");
     card.querySelector(".status").textContent =
-      ok?"せいかい！":"ざんねん…";
+      okAll?"せいかい！":"ざんねん…";
 
-    if(ok) score+=10;
+    if(okAll) score+=10;
   });
 
   document.getElementById("score").textContent =
