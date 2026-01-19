@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ã‚ã¾ã‚Šã®ã‚ã‚‹ã‚ã‚Šç®—ãƒ—ãƒªãƒ³ãƒˆ</title>
+  <title>‚ ‚Ü‚è‚Ì‚ ‚é‚í‚èŽZƒvƒŠƒ“ƒg</title>
   <style>
     body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; margin: 20px; line-height: 1.6; }
     .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -31,41 +31,41 @@
   <div class="sheet">
     <div class="no-print row" style="justify-content: space-between;">
       <div class="row">
-        <button id="makeBtn">å•é¡Œã‚’ä½œã‚‹</button>
-        <button id="checkBtn">ç­”ãˆåˆã‚ã›</button>
-        <button id="toggleAnsBtn">ç­”ãˆã‚’è¦‹ã‚‹</button>
-        <button id="printBtn">å°åˆ·ã™ã‚‹</button>
+        <button id="makeBtn">–â‘è‚ðì‚é</button>
+        <button id="checkBtn">“š‚¦‡‚í‚¹</button>
+        <button id="toggleAnsBtn">“š‚¦‚ðŒ©‚é</button>
+        <button id="printBtn">ˆóü‚·‚é</button>
       </div>
-      <div class="muted">âš ï¸ æ•°å­—ã¯åŠè§’ã§å…¥åŠ›ã—ã¦ã­</div>
+      <div class="muted">?? ”Žš‚Í”¼Šp‚Å“ü—Í‚µ‚Ä‚Ë</div>
     </div>
 
-    <h1>3å¹´ç”Ÿ ç®—æ•° ã‚ã¾ã‚Šã®ã‚ã‚‹ ã‚ã‚Šç®—</h1>
+    <h1>3”N¶ ŽZ” ‚ ‚Ü‚è‚Ì‚ ‚é ‚í‚èŽZ</h1>
 
     <div class="meta">
-      <div>å¹´ï¼š_____ã€€çµ„ï¼š_____</div>
-      <div>åå‰ï¼š________________</div>
+      <div>”NF_____@‘gF_____</div>
+      <div>–¼‘OF________________</div>
     </div>
 
-    <div class="score" id="score">ç‚¹æ•°ï¼šâ€” / 100</div>
-    <div class="muted">â€» â–¡ã®ä¸­ã«æ•°å­—ã‚’å…¥ã‚Œã¦ã€ã€Œç­”ãˆåˆã‚ã›ã€ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ã¦ã­ã€‚</div>
+    <div class="score" id="score">“_”F? / 100</div>
+    <div class="muted">¦  ‚Ì’†‚É”Žš‚ð“ü‚ê‚ÄAu“š‚¦‡‚í‚¹vƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚Ä‚ËB</div>
 
     <div class="grid" id="qs"></div>
 
     <div class="answers" id="answers">
-      <h2>ã€è§£ç­”ã€‘</h2>
+      <h2>y‰ð“šz</h2>
       <div id="ansList"></div>
     </div>
   </div>
 
 <script>
-  // ---- è¨­å®š ----
-  const QUESTION_COUNT = 20;   // 20å•ã§1å•5ç‚¹ â†’ 100ç‚¹
+  // ---- Ý’è ----
+  const QUESTION_COUNT = 20;   // 20–â‚Å1–â5“_ ¨ 100“_
   const DIV_MIN = 2;
   const DIV_MAX = 9;
   const Q_MIN = 2;
   const Q_MAX = 9;
 
-  // å•é¡Œãƒ‡ãƒ¼ã‚¿ {a, b, q, r} : a Ã· b = q ã‚ã¾ã‚Š r
+  // –â‘èƒf[ƒ^ {a, b, q, r} : a € b = q ‚ ‚Ü‚è r
   let problems = [];
 
   const elQs = document.getElementById("qs");
@@ -84,7 +84,7 @@
     while (out.length < QUESTION_COUNT) {
       const b = randInt(DIV_MIN, DIV_MAX);
       const q = randInt(Q_MIN, Q_MAX);
-      const r = randInt(1, b - 1);   // ã‚ã¾ã‚Šã¯ 1ã€œb-1
+      const r = randInt(1, b - 1);   // ‚ ‚Ü‚è‚Í 1?b-1
       const a = b * q + r;
 
       const key = `${a}/${b}`;
@@ -103,26 +103,26 @@
       div.innerHTML = `
         <div>
           <span class="n">${i + 1}.</span>
-          ${p.a} Ã· ${p.b} ï¼ 
-          <span>â–¡</span>
-          <input type="number" inputmode="numeric" min="0" class="ansQ" aria-label="å•† ${i+1}">
-          ã‚ã¾ã‚Š
-          <span>â–¡</span>
-          <input type="number" inputmode="numeric" min="0" class="ansR" aria-label="ã‚ã¾ã‚Š ${i+1}">
+          ${p.a} € ${p.b}  
+          <span> </span>
+          <input type="number" inputmode="numeric" min="0" class="ansQ" aria-label="¤ ${i+1}">
+          ‚ ‚Ü‚è
+          <span> </span>
+          <input type="number" inputmode="numeric" min="0" class="ansR" aria-label="‚ ‚Ü‚è ${i+1}">
         </div>
         <div class="muted" style="margin-top:6px;">
-          ï¼ˆå•†ã¨ã‚ã¾ã‚Šã‚’ç­”ãˆã‚‹ï¼‰
+          i¤‚Æ‚ ‚Ü‚è‚ð“š‚¦‚éj
         </div>
       `;
       elQs.appendChild(div);
     });
 
-    // è§£ç­”æ¬„
+    // ‰ð“š—“
     elAnsList.innerHTML = problems.map((p, i) =>
-      `<div>${i + 1}. ${p.a} Ã· ${p.b} = ${p.q} ã‚ã¾ã‚Š ${p.r}</div>`
+      `<div>${i + 1}. ${p.a} € ${p.b} = ${p.q} ‚ ‚Ü‚è ${p.r}</div>`
     ).join("");
 
-    elScore.textContent = "ç‚¹æ•°ï¼šâ€” / 100";
+    elScore.textContent = "“_”F? / 100";
     elAnswers.style.display = "none";
   }
 
@@ -143,7 +143,7 @@
       if (ok) score += pointPer;
     });
 
-    elScore.textContent = `ç‚¹æ•°ï¼š${Math.round(score)} / 100`;
+    elScore.textContent = `“_”F${Math.round(score)} / 100`;
   }
 
   document.getElementById("makeBtn").addEventListener("click", () => {
@@ -156,7 +156,7 @@
   });
   document.getElementById("printBtn").addEventListener("click", () => window.print());
 
-  // åˆæœŸè¡¨ç¤º
+  // ‰Šú•\Ž¦
   problems = generateProblems();
   render();
 </script>
