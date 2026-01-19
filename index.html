@@ -31,30 +31,43 @@ body{
   padding:14px;
   box-shadow:var(--shadow);
 }
-h1{ margin:0 0 6px; font-size:22px; }
+h1{ margin:0 0 8px; font-size:22px; }
 
-.controls button{
-  margin:4px 4px 0 0;
-  padding:8px 12px;
+/* ボタン配置：左端と右端に分ける */
+.controlsRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.controlsLeft, .controlsRight{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+button{
+  padding:9px 12px;
   border-radius:12px;
-  border:none;
+  border:1px solid var(--line);
+  background:#fff;
   font-weight:900;
-  background:var(--accent);
-  color:#fff;
   cursor:pointer;
 }
-.controls .secondary{
-  background:#fff;
-  color:var(--ink);
-  border:1px solid var(--line);
+button.primary{
+  background:var(--accent);
+  border-color:transparent;
+  color:#fff;
 }
+button:active{ transform: translateY(1px); }
 
 .main{
   margin-top:16px;
   display:grid;
-  grid-template-columns: 1.15fr 0.85fr; /* 左：問題 右：手書き */
+  grid-template-columns: 1.15fr 0.85fr;
   gap:12px;
-  align-items:start;
 }
 @media(max-width:980px){
   .main{ grid-template-columns:1fr; }
@@ -86,6 +99,14 @@ h1{ margin:0 0 6px; font-size:22px; }
   box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
+/* 1問の中身：左＝式、右＝答えボタン */
+.qRow{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:10px;
+  align-items:start;
+}
+
 .line{
   display:flex;
   align-items:center;
@@ -96,10 +117,7 @@ h1{ margin:0 0 6px; font-size:22px; }
 }
 
 /* 入力欄＋〇 */
-.answerBox{
-  position:relative;
-  display:inline-block;
-}
+.answerBox{ position:relative; display:inline-block; }
 .answerBox input{
   width:64px;
   padding:6px;
@@ -111,8 +129,6 @@ h1{ margin:0 0 6px; font-size:22px; }
   position:relative;
   z-index:1;
 }
-
-/* 〇（中心一致） */
 .circle{
   position:absolute;
   width:40px;
@@ -128,13 +144,39 @@ h1{ margin:0 0 6px; font-size:22px; }
 }
 .answerBox.ok .circle{ display:block; }
 
+/* 各問題の右端ボタン */
+.qActions{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:stretch;
+  min-width:130px;
+}
+.qActions button{
+  width:130px;
+  white-space:nowrap;
+}
+
+/* 答え表示（右側/または式の下に出る） */
+.ansReveal{
+  margin-top:8px;
+  display:none;
+  font-weight:1000;
+  color:#111827;
+  background:#f8fafc;
+  border:1px dashed #cbd5e1;
+  border-radius:12px;
+  padding:8px 10px;
+}
+.ansReveal.show{ display:block; }
+
 .score{
   margin-top:14px;
   font-weight:1000;
   font-size:18px;
 }
 
-/* ===== 手書きスペース ===== */
+/* ===== 手書き ===== */
 .boardHeader{
   display:flex;
   align-items:center;
@@ -143,15 +185,8 @@ h1{ margin:0 0 6px; font-size:22px; }
   flex-wrap:wrap;
   margin-bottom:10px;
 }
-.boardTitle{
-  font-weight:1000;
-  font-size:16px;
-}
-.boardTools{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
+.boardTitle{ font-weight:1000; font-size:16px; }
+.boardTools{ display:flex; gap:8px; flex-wrap:wrap; }
 .toolBtn{
   padding:8px 10px;
   border-radius:12px;
@@ -164,7 +199,6 @@ h1{ margin:0 0 6px; font-size:22px; }
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(79,70,229,.15);
 }
-
 .canvasWrap{
   border:2px dashed #cbd5e1;
   border-radius:16px;
@@ -174,13 +208,13 @@ h1{ margin:0 0 6px; font-size:22px; }
 }
 #board{
   width:100%;
-  height:520px;          /* 高さはここで調整 */
+  height:520px;
   display:block;
-  touch-action:none;     /* タッチでスクロールしない */
+  touch-action:none;
   background:
     linear-gradient(#f9fafb 1px, transparent 1px),
     linear-gradient(90deg, #f9fafb 1px, transparent 1px);
-  background-size: 24px 24px; /* 方眼 */
+  background-size: 24px 24px;
 }
 .boardHint{
   margin-top:10px;
@@ -196,9 +230,17 @@ h1{ margin:0 0 6px; font-size:22px; }
 
   <div class="top">
     <h1>あまりのある わり算（3年生）</h1>
-    <div class="controls">
-      <button id="makeBtn">もんだいをつくる</button>
-      <button class="secondary" id="checkBtn">こたえあわせ</button>
+
+    <div class="controlsRow">
+      <div class="controlsLeft">
+        <!-- 左端：こたえあわせ -->
+        <button class="primary" id="checkBtn">こたえあわせ</button>
+      </div>
+
+      <div class="controlsRight">
+        <!-- 右端：問題をつくる（離す） -->
+        <button id="makeBtn">もんだいをつくる</button>
+      </div>
     </div>
   </div>
 
@@ -227,6 +269,7 @@ h1{ margin:0 0 6px; font-size:22px; }
       <div class="boardHint">※ 指でも書けます。消しゴムは「消しゴム」ボタンで切り替え。</div>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -263,29 +306,57 @@ function makeProblems(){
 function render(){
   const qs=document.getElementById("qs");
   qs.innerHTML="";
-  problems.forEach((p)=>{
+
+  problems.forEach((p, idx)=>{
     const d=document.createElement("div");
     d.className="q";
     d.innerHTML=`
-      <div class="line">
-        ${p.a} ÷ ${p.b} ＝
-        <span class="answerBox">
-          <input class="ansQ" inputmode="numeric">
-          <span class="circle"></span>
-        </span>
-        <span>あまり</span>
-        <span class="answerBox">
-          <input class="ansR" inputmode="numeric">
-          <span class="circle"></span>
-        </span>
+      <div class="qRow">
+        <div class="qMain">
+          <div class="line">
+            ${p.a} ÷ ${p.b} ＝
+            <span class="answerBox">
+              <input class="ansQ" inputmode="numeric" aria-label="商 ${idx+1}">
+              <span class="circle"></span>
+            </span>
+            <span>あまり</span>
+            <span class="answerBox">
+              <input class="ansR" inputmode="numeric" aria-label="あまり ${idx+1}">
+              <span class="circle"></span>
+            </span>
+          </div>
+
+          <div class="ansReveal" aria-live="polite"></div>
+        </div>
+
+        <div class="qActions">
+          <button class="toggleAnsBtn" type="button">こたえを見る</button>
+        </div>
       </div>
     `;
     qs.appendChild(d);
-  });
 
-  document.querySelectorAll("input").forEach(inp=>{
-    inp.addEventListener("input",e=>{
-      e.target.value = toHalfWidth(e.target.value);
+    // 入力：全角→半角
+    d.querySelectorAll("input").forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        e.target.value = toHalfWidth(e.target.value);
+      });
+    });
+
+    // こたえを見る/かくす
+    const btn = d.querySelector(".toggleAnsBtn");
+    const ans = d.querySelector(".ansReveal");
+    btn.addEventListener("click", ()=>{
+      const showing = ans.classList.contains("show");
+      if(showing){
+        ans.classList.remove("show");
+        ans.textContent = "";
+        btn.textContent = "こたえを見る";
+      }else{
+        ans.textContent = `こたえ： ${p.q} あまり ${p.r}`;
+        ans.classList.add("show");
+        btn.textContent = "こたえをかくす";
+      }
     });
   });
 
@@ -329,20 +400,17 @@ let mode = "pen"; // pen | eraser
 function resizeCanvas(){
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  const w = Math.floor(rect.width * dpr);
-  const h = Math.floor(rect.height * dpr);
 
-  // 既存の絵を保持したいので、いったん退避
+  // 退避
   const old = document.createElement("canvas");
   old.width = canvas.width;
   old.height = canvas.height;
   old.getContext("2d").drawImage(canvas,0,0);
 
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
 
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  // 退避した絵を戻す（サイズが変わると多少ズレるが実用OK）
   ctx.drawImage(old, 0, 0, old.width, old.height, 0, 0, rect.width, rect.height);
   setPenStyle();
 }
@@ -355,7 +423,6 @@ function setPenStyle(){
     ctx.lineWidth = 4;
     ctx.strokeStyle = "#111827";
   }else{
-    // 消しゴム：描画を透明に抜く
     ctx.globalCompositeOperation = "destination-out";
     ctx.lineWidth = 16;
     ctx.strokeStyle = "rgba(0,0,0,1)";
@@ -375,7 +442,6 @@ function startDraw(e){
   const p = getPos(e);
   lastX = p.x; lastY = p.y;
 }
-
 function moveDraw(e){
   if(!drawing) return;
   e.preventDefault();
@@ -386,10 +452,7 @@ function moveDraw(e){
   ctx.stroke();
   lastX = p.x; lastY = p.y;
 }
-
-function endDraw(){
-  drawing = false;
-}
+function endDraw(){ drawing = false; }
 
 /* マウス */
 canvas.addEventListener("mousedown", startDraw);
