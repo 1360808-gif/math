@@ -96,14 +96,12 @@ button:active{ transform: translateY(1px); }
   box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
-/* 1行に収めるための行レイアウト */
+/* 1行 */
 .qRow{
   display:flex;
   align-items:center;
   gap:10px;
 }
-
-/* 左側：式＋解答欄（基本は1行） */
 .qInline{
   display:flex;
   align-items:center;
@@ -113,7 +111,6 @@ button:active{ transform: translateY(1px); }
   white-space:nowrap;
   overflow:hidden;
 }
-
 .expr{
   font-size:18px;
   font-weight:1000;
@@ -153,9 +150,14 @@ button:active{ transform: translateY(1px); }
   opacity:.85;
 }
 
-/* 右端：小さいボタン（中を2行表示） */
+/* 押してる間の表示中は少し薄く（答え見てる感） */
+.answerBox.revealing input{
+  background:#f8fafc;
+}
+
+/* 小さい2行ボタン */
 .smallBtn{
-  width:60px;              /* 今の小さめサイズ感 */
+  width:60px;
   height:38px;
   border-radius:12px;
   border:1px solid var(--line);
@@ -165,6 +167,8 @@ button:active{ transform: translateY(1px); }
   cursor:pointer;
   flex:none;
   padding:0;
+  user-select:none;
+  -webkit-user-select:none;
 }
 .smallBtn span{
   display:block;
@@ -174,18 +178,6 @@ button:active{ transform: translateY(1px); }
 }
 .smallBtn:active{ transform: translateY(1px); }
 
-/* 答え表示：行内に小さく */
-.ansTiny{
-  display:none;
-  margin-left:8px;
-  font-size:14px;
-  font-weight:1000;
-  color:#111827;
-  opacity:.9;
-}
-.ansTiny.show{ display:inline; }
-
-/* 超狭い時だけ保険で折り返し許可 */
 @media(max-width:360px){
   .qInline{ white-space:normal; }
 }
@@ -262,13 +254,11 @@ button:active{ transform: translateY(1px); }
   </div>
 
   <div class="main">
-    <!-- 左：問題 -->
     <div class="panel">
       <div class="grid" id="qs"></div>
       <div class="score" id="score">点数：— / 100</div>
     </div>
 
-    <!-- 右：手書き -->
     <div class="panel">
       <div class="boardHeader">
         <div class="boardTitle">✍ 手書き計算スペース</div>
@@ -327,22 +317,20 @@ function render(){
         <div class="qInline">
           <span class="expr">${p.a} ÷ ${p.b} ＝</span>
 
-          <span class="answerBox">
+          <span class="answerBox qBox">
             <input class="ansQ" inputmode="numeric" aria-label="商 ${idx+1}">
             <span class="circle"></span>
           </span>
 
           <span class="remLabel">あまり</span>
 
-          <span class="answerBox">
+          <span class="answerBox rBox">
             <input class="ansR" inputmode="numeric" aria-label="あまり ${idx+1}">
             <span class="circle"></span>
           </span>
-
-          <span class="ansTiny" aria-live="polite"></span>
         </div>
 
-        <button class="smallBtn toggleAnsBtn" type="button" aria-label="こたえを見る">
+        <button class="smallBtn holdAnsBtn" type="button" aria-label="こたえをみる（おしているあいだ）">
           <span>こたえを</span>
           <span>みる</span>
         </button>
@@ -350,36 +338,67 @@ function render(){
     `;
     qs.appendChild(d);
 
+    const qInput = d.querySelector(".ansQ");
+    const rInput = d.querySelector(".ansR");
+    const qBox = d.querySelector(".qBox");
+    const rBox = d.querySelector(".rBox");
+    const holdBtn = d.querySelector(".holdAnsBtn");
+
     // 入力：全角→半角
-    d.querySelectorAll("input").forEach(inp=>{
+    [qInput, rInput].forEach(inp=>{
       inp.addEventListener("input",(e)=>{
         e.target.value = toHalfWidth(e.target.value);
       });
     });
 
-    // 答え表示切り替え
-    const btn = d.querySelector(".toggleAnsBtn");
-    const ans = d.querySelector(".ansTiny");
+    // 押している間だけ答えを入力欄に表示（元の入力は保持）
+    let savedQ = "";
+    let savedR = "";
 
-    function setBtn(showing){
-      btn.innerHTML = showing
-        ? `<span>こたえを</span><span>かくす</span>`
-        : `<span>こたえを</span><span>みる</span>`;
-      btn.setAttribute("aria-label", showing ? "こたえをかくす" : "こたえを見る");
+    function showAnswer(){
+      // すでに表示中なら何もしない
+      if(holdBtn.dataset.holding === "1") return;
+      holdBtn.dataset.holding = "1";
+
+      savedQ = qInput.value;
+      savedR = rInput.value;
+
+      qInput.value = String(p.q);
+      rInput.value = String(p.r);
+
+      // 触れないように
+      qInput.readOnly = true;
+      rInput.readOnly = true;
+
+      qBox.classList.add("revealing");
+      rBox.classList.add("revealing");
     }
 
-    btn.addEventListener("click", ()=>{
-      const showing = ans.classList.contains("show");
-      if(showing){
-        ans.classList.remove("show");
-        ans.textContent = "";
-        setBtn(false);
-      }else{
-        ans.textContent = `= ${p.q} あまり ${p.r}`;
-        ans.classList.add("show");
-        setBtn(true);
-      }
-    });
+    function hideAnswer(){
+      if(holdBtn.dataset.holding !== "1") return;
+      holdBtn.dataset.holding = "0";
+
+      qInput.value = savedQ;
+      rInput.value = savedR;
+
+      qInput.readOnly = false;
+      rInput.readOnly = false;
+
+      qBox.classList.remove("revealing");
+      rBox.classList.remove("revealing");
+    }
+
+    // マウス：押したら表示、離したら非表示
+    holdBtn.addEventListener("mousedown", (e)=>{ e.preventDefault(); showAnswer(); });
+    window.addEventListener("mouseup", hideAnswer);
+
+    // タッチ：押したら表示、離したら非表示
+    holdBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); showAnswer(); }, {passive:false});
+    holdBtn.addEventListener("touchend", (e)=>{ e.preventDefault(); hideAnswer(); }, {passive:false});
+    holdBtn.addEventListener("touchcancel", hideAnswer);
+
+    // ボタン外に指が出た時も戻す（保険）
+    holdBtn.addEventListener("mouseleave", hideAnswer);
   });
 
   document.getElementById("score").textContent="点数：— / 100";
@@ -467,6 +486,7 @@ window.addEventListener("mouseup", endDraw);
 canvas.addEventListener("touchstart", startDraw, {passive:false});
 canvas.addEventListener("touchmove", moveDraw, {passive:false});
 canvas.addEventListener("touchend", endDraw);
+canvas.addEventListener("touchcancel", endDraw);
 
 const penBtn=document.getElementById("penBtn");
 const eraserBtn=document.getElementById("eraserBtn");
