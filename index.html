@@ -3,78 +3,427 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>あまりのあるわり算プリント</title>
+  <title>あまりのあるわり算プリント（3年生）</title>
   <style>
-    body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; margin: 20px; line-height: 1.6; }
-    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    button { padding: 8px 12px; cursor: pointer; }
-    input[type="number"] { width: 70px; padding: 6px; }
-    .sheet { max-width: 900px; margin: 0 auto; }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; margin-top: 16px; }
-    .q { border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
-    .q .n { font-weight: 700; margin-right: 6px; }
-    .meta { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .score { font-weight: 700; margin-top: 10px; }
-    .muted { color: #666; font-size: 0.9em; }
-    .ok { background: #e9ffe9; }
-    .ng { background: #ffe9e9; }
-    .answers { margin-top: 18px; border-top: 2px dashed #ccc; padding-top: 14px; display: none; }
-    @media print {
-      .no-print { display: none !important; }
-      body { margin: 0; }
-      .q { break-inside: avoid; }
-      .answers { display: block !important; }
+    :root{
+      --bg:#f7f8ff;
+      --card:#ffffff;
+      --ink:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --accent:#4f46e5;
+      --accent2:#06b6d4;
+      --shadow: 0 10px 24px rgba(0,0,0,.08);
+      --radius: 18px;
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: radial-gradient(900px 500px at 10% 0%, #e9f2ff 0%, transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, #e7fff9 0%, transparent 55%),
+                  var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .wrap{ max-width: 980px; margin: 18px auto; padding: 0 14px 40px; }
+
+    .top{
+      background: linear-gradient(135deg, #ffffff 0%, #f4f7ff 45%, #ecfeff 100%);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow);
+      padding: 16px 16px 14px;
+      position: sticky;
+      top: 10px;
+      z-index: 5;
+      backdrop-filter: blur(6px);
+    }
+
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .spacer{ flex:1; min-width: 120px; }
+
+    h1{
+      margin: 2px 0 8px;
+      font-size: 22px;
+      letter-spacing: .02em;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .badge{
+      font-size: 12px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: #3730a3;
+      font-weight: 700;
+    }
+
+    .controls button{
+      border: 0;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(79,70,229,.14);
+      background: var(--accent);
+      color: #fff;
+    }
+    .controls button.secondary{
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+    .controls button:active{ transform: translateY(1px); }
+
+    .hint{ color: var(--muted); font-size: 13px; }
+    .meta{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .panel{
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+    }
+    @media (max-width: 860px){
+      .panel{ grid-template-columns: 1fr; }
+      .top{ position: static; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .progressBox{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .bar{
+      flex:1;
+      min-width: 220px;
+      height: 12px;
+      background: #eef2ff;
+      border: 1px solid #dbeafe;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar > div{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+      transition: width .25s ease;
+    }
+    .score{
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .praise{
+      font-weight: 900;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #14532d;
+      display:none;
+    }
+
+    .settings{
+      display:flex; gap:10px; align-items:end; flex-wrap:wrap;
+    }
+    label{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    select, input[type="number"]{
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 16px;
+      background: #fff;
+      color: var(--ink);
+      width: 140px;
+    }
+    .tiny{ width: 110px; }
+
+    .grid{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 720px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .q{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 12px;
+      box-shadow: 0 10px 18px rgba(0,0,0,.05);
+      position: relative;
+    }
+    .qHeader{
+      display:flex; align-items:center; justify-content: space-between;
+      margin-bottom: 6px;
+      gap: 10px;
+    }
+    .num{
+      font-weight: 1000;
+      background: #ecfeff;
+      border: 1px solid #a5f3fc;
+      color: #155e75;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      flex: none;
+    }
+    .status{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 900;
+      flex: none;
+    }
+
+    .expr{
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap: 8px;
+    }
+
+    .ans{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      color: var(--muted);
+      font-weight: 900;
+    }
+    .ans input{
+      width: 88px;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 14px;
+      border: 2px solid #e5e7eb;
+      outline: none;
+    }
+    .ans input:focus{
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(59,130,246,.15);
+    }
+
+    .ok{ background: #f0fdf4; border-color: #bbf7d0; }
+    .ng{ background: #fff1f2; border-color: #fecdd3; }
+    .ok .status{ color: var(--good); }
+    .ng .status{ color: var(--bad); }
+
+    .answers{
+      margin-top: 12px;
+      display:none;
+      border-top: 2px dashed #cbd5e1;
+      padding-top: 12px;
+    }
+    .answers h2{ margin: 0 0 8px; font-size: 18px; }
+    .ansList{ columns: 2; column-gap: 18px; }
+    @media (max-width: 720px){ .ansList{ columns: 1; } }
+    .ansList div{ break-inside: avoid; margin: 0 0 6px; color: var(--muted); font-weight: 800; }
+
+    /* 画面演出（紙には出さない） */
+    .confetti{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      display:none;
+    }
+    .confetti i{
+      position:absolute;
+      top:-10px;
+      width:10px; height:10px;
+      border-radius: 2px;
+      animation: fall 900ms linear forwards;
+      opacity:.9;
+    }
+    @keyframes fall{
+      to{ transform: translateY(110vh) rotate(540deg); }
+    }
+
+    @media print{
+      body{ background:#fff; }
+      .top, .panel .card:last-child, .confetti{ display:none !important; }
+      .wrap{ max-width: none; margin: 0; padding: 0; }
+      .card{ box-shadow:none; border:none; }
+      .q{ break-inside: avoid; box-shadow:none; }
+      .answers{ display:block !important; }
     }
   </style>
 </head>
+
 <body>
-  <div class="sheet">
-    <div class="no-print row" style="justify-content: space-between;">
-      <div class="row">
-        <button id="makeBtn">問題を作る</button>
-        <button id="checkBtn">答え合わせ</button>
-        <button id="toggleAnsBtn">答えを見る</button>
-        <button id="printBtn">印刷する</button>
+  <div class="confetti" id="confetti"></div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="row" style="justify-content: space-between;">
+        <h1>
+          あまりのある わり算
+          <span class="badge">3年生向け</span>
+        </h1>
+        <div class="controls row">
+          <button id="makeBtn">もんだい を つくる</button>
+          <button class="secondary" id="checkBtn">こたえあわせ</button>
+          <button class="secondary" id="toggleAnsBtn">こたえ を みる</button>
+          <button class="secondary" id="printBtn">いんさつ</button>
+        </div>
       </div>
-      <div class="muted">⚠️ 数字は半角で入力してね</div>
+
+      <div class="row">
+        <div class="hint">💡「しょう」と「あまり」を入れてね（数字は半角）</div>
+        <div class="spacer"></div>
+        <div class="meta">
+          <div>年：_____　組：_____</div>
+          <div>名前：________________</div>
+        </div>
+      </div>
     </div>
 
-    <h1>3年生 算数 あまりのある わり算</h1>
+    <div class="panel">
+      <div class="card">
+        <div class="progressBox">
+          <div class="score" id="score">点数：— / 100</div>
+          <div class="bar" aria-label="進みぐあい"><div id="barFill"></div></div>
+          <div class="hint" id="progressText">進み：0 / 20</div>
+          <div class="praise" id="praise">すごい！</div>
+        </div>
+      </div>
 
-    <div class="meta">
-      <div>年：_____　組：_____</div>
-      <div>名前：________________</div>
+      <div class="card">
+        <div class="settings">
+          <label>
+            もんだい数
+            <select id="countSel">
+              <option value="10">10もん</option>
+              <option value="15">15もん</option>
+              <option value="20" selected>20もん</option>
+              <option value="30">30もん</option>
+            </select>
+          </label>
+
+          <label>
+            わる数（÷）
+            <select id="divSel">
+              <option value="2-5">2〜5</option>
+              <option value="2-9" selected>2〜9</option>
+            </select>
+          </label>
+
+          <label>
+            しょうの大きさ
+            <select id="qSel">
+              <option value="2-6">2〜6</option>
+              <option value="2-9" selected>2〜9</option>
+              <option value="3-9">3〜9</option>
+            </select>
+          </label>
+
+          <label>
+            スピード
+            <select id="speedSel">
+              <option value="off" selected>オフ</option>
+              <option value="on">タイマーON</option>
+            </select>
+          </label>
+
+          <div class="hint" id="timer" style="font-weight:1000;">⏱ 0:00</div>
+        </div>
+      </div>
     </div>
-
-    <div class="score" id="score">点数：— / 100</div>
-    <div class="muted">※ □の中に数字を入れて、「答え合わせ」ボタンを押してね。</div>
 
     <div class="grid" id="qs"></div>
 
-    <div class="answers" id="answers">
-      <h2>【解答】</h2>
-      <div id="ansList"></div>
+    <div class="card answers" id="answers">
+      <h2>【かいとう】</h2>
+      <div class="ansList" id="ansList"></div>
     </div>
   </div>
 
 <script>
-  // ---- 設定 ----
-  const QUESTION_COUNT = 20;   // 20問で1問5点 → 100点
-  const DIV_MIN = 2;
-  const DIV_MAX = 9;
-  const Q_MIN = 2;
-  const Q_MAX = 9;
+  // ========== 3年生向け最適化 ==========
+  // ・入力しやすいUI（大きめ、中央寄せ）
+  // ・進み具合バー
+  // ・全部正解/高得点で紙吹雪
+  // ・設定で難易度を軽く調整できる
 
-  // 問題データ {a, b, q, r} : a ÷ b = q あまり r
   let problems = [];
+  let QUESTION_COUNT = 20;
+  let DIV_MIN = 2, DIV_MAX = 9;
+  let Q_MIN = 2, Q_MAX = 9;
 
   const elQs = document.getElementById("qs");
   const elScore = document.getElementById("score");
   const elAnswers = document.getElementById("answers");
   const elAnsList = document.getElementById("ansList");
+  const elBar = document.getElementById("barFill");
+  const elProg = document.getElementById("progressText");
+  const elPraise = document.getElementById("praise");
+  const elConfetti = document.getElementById("confetti");
+
+  const countSel = document.getElementById("countSel");
+  const divSel = document.getElementById("divSel");
+  const qSel = document.getElementById("qSel");
+  const speedSel = document.getElementById("speedSel");
+  const timerEl = document.getElementById("timer");
+
+  let timerId = null;
+  let startAt = null;
 
   function randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function parseRange(str){
+    const [a,b] = str.split("-").map(Number);
+    return {min:a, max:b};
+  }
+
+  function applySettings(){
+    QUESTION_COUNT = Number(countSel.value);
+
+    const d = parseRange(divSel.value);
+    DIV_MIN = d.min; DIV_MAX = d.max;
+
+    const q = parseRange(qSel.value);
+    Q_MIN = q.min; Q_MAX = q.max;
   }
 
   function generateProblems() {
@@ -82,9 +431,9 @@
     const out = [];
 
     while (out.length < QUESTION_COUNT) {
-      const b = randInt(DIV_MIN, DIV_MAX);
-      const q = randInt(Q_MIN, Q_MAX);
-      const r = randInt(1, b - 1);   // あまりは 1〜b-1
+      const b = randInt(DIV_MIN, DIV_MAX);      // わる数
+      const q = randInt(Q_MIN, Q_MAX);          // しょう
+      const r = randInt(1, b - 1);              // あまり（必ずある）
       const a = b * q + r;
 
       const key = `${a}/${b}`;
@@ -95,68 +444,189 @@
     return out;
   }
 
+  function formatTime(ms){
+    const sec = Math.floor(ms/1000);
+    const m = Math.floor(sec/60);
+    const s = sec%60;
+    return `${m}:${String(s).padStart(2,"0")}`;
+  }
+
+  function startTimer(){
+    stopTimer();
+    startAt = Date.now();
+    timerEl.textContent = `⏱ 0:00`;
+    if (speedSel.value === "on") {
+      timerId = setInterval(() => {
+        timerEl.textContent = `⏱ ${formatTime(Date.now()-startAt)}`;
+      }, 250);
+    }
+  }
+  function stopTimer(){
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+  }
+
+  function updateProgress(){
+    const inputsQ = Array.from(document.querySelectorAll(".ansQ"));
+    const inputsR = Array.from(document.querySelectorAll(".ansR"));
+
+    let filled = 0;
+    for(let i=0;i<QUESTION_COUNT;i++){
+      const hasQ = inputsQ[i]?.value !== "";
+      const hasR = inputsR[i]?.value !== "";
+      if (hasQ && hasR) filled++;
+    }
+    elProg.textContent = `進み：${filled} / ${QUESTION_COUNT}`;
+    const pct = Math.round((filled/QUESTION_COUNT)*100);
+    elBar.style.width = `${pct}%`;
+  }
+
+  function setPraise(text, show=true){
+    elPraise.textContent = text;
+    elPraise.style.display = show ? "inline-block" : "none";
+  }
+
+  function popConfetti(){
+    elConfetti.innerHTML = "";
+    elConfetti.style.display = "block";
+
+    // 色はCSSで指定しない約束に近いけど、ここは演出なので最小限で
+    const colors = ["#4f46e5","#06b6d4","#22c55e","#f59e0b","#ef4444"];
+    const n = 60;
+    for(let i=0;i<n;i++){
+      const p = document.createElement("i");
+      const left = Math.random()*100;
+      const delay = Math.random()*150;
+      const size = 6 + Math.random()*8;
+      p.style.left = left + "vw";
+      p.style.animationDelay = delay + "ms";
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      elConfetti.appendChild(p);
+    }
+    setTimeout(()=>{ elConfetti.style.display="none"; }, 1000);
+  }
+
   function render() {
     elQs.innerHTML = "";
     problems.forEach((p, i) => {
       const div = document.createElement("div");
       div.className = "q";
       div.innerHTML = `
-        <div>
-          <span class="n">${i + 1}.</span>
-          ${p.a} ÷ ${p.b} ＝ 
-          <span>□</span>
+        <div class="qHeader">
+          <span class="num">${i + 1} もんめ</span>
+          <span class="status">まだ</span>
+        </div>
+
+        <div class="expr">
+          ${p.a} ÷ ${p.b} ＝
+        </div>
+
+        <div class="ans">
+          しょう
           <input type="number" inputmode="numeric" min="0" class="ansQ" aria-label="商 ${i+1}">
           あまり
-          <span>□</span>
           <input type="number" inputmode="numeric" min="0" class="ansR" aria-label="あまり ${i+1}">
-        </div>
-        <div class="muted" style="margin-top:6px;">
-          （商とあまりを答える）
         </div>
       `;
       elQs.appendChild(div);
     });
 
-    // 解答欄
     elAnsList.innerHTML = problems.map((p, i) =>
-      `<div>${i + 1}. ${p.a} ÷ ${p.b} = ${p.q} あまり ${p.r}</div>`
+      `<div>${i + 1}：${p.a} ÷ ${p.b} = ${p.q} あまり ${p.r}</div>`
     ).join("");
 
     elScore.textContent = "点数：— / 100";
     elAnswers.style.display = "none";
+    setPraise("", false);
+    updateProgress();
+    startTimer();
+
+    // 入力で進み更新
+    elQs.querySelectorAll("input").forEach(inp=>{
+      inp.addEventListener("input", updateProgress);
+      inp.addEventListener("keydown", (e)=>{
+        // Enterで次へ（3年生でも使いやすい）
+        if(e.key === "Enter"){
+          const all = Array.from(elQs.querySelectorAll("input"));
+          const idx = all.indexOf(e.target);
+          if(idx >= 0 && idx+1 < all.length) all[idx+1].focus();
+        }
+      });
+    });
   }
 
   function check() {
-    const qs = Array.from(document.querySelectorAll(".q"));
+    const boxes = Array.from(document.querySelectorAll(".q"));
     const pointPer = 100 / QUESTION_COUNT;
     let score = 0;
+    let perfect = true;
 
-    qs.forEach((box, i) => {
+    boxes.forEach((box, i) => {
       const qIn = box.querySelector(".ansQ");
       const rIn = box.querySelector(".ansR");
       const userQ = Number(qIn.value);
       const userR = Number(rIn.value);
-      const ok = (userQ === problems[i].q) && (userR === problems[i].r);
+
+      const ok = (qIn.value !== "" && rIn.value !== "" &&
+                  userQ === problems[i].q && userR === problems[i].r);
 
       box.classList.remove("ok", "ng");
       box.classList.add(ok ? "ok" : "ng");
+      box.querySelector(".status").textContent = ok ? "せいかい！⭐" : "ざんねん…";
       if (ok) score += pointPer;
+      if (!ok) perfect = false;
     });
 
-    elScore.textContent = `点数：${Math.round(score)} / 100`;
+    const s = Math.round(score);
+    elScore.textContent = `点数：${s} / 100`;
+
+    // ほめ言葉（3年生向け）
+    if (s === 100){
+      setPraise("かんぺき！！ ぜんぶせいかい！🎉");
+      popConfetti();
+    } else if (s >= 90){
+      setPraise("すごい！もうちょっとでかんぺき！✨");
+      popConfetti();
+    } else if (s >= 70){
+      setPraise("いいね！まちがいをなおしてみよう！");
+    } else {
+      setPraise("だいじょうぶ！ゆっくりやればできるよ！");
+    }
+
+    // タイマー停止（ONのときだけ見せる）
+    stopTimer();
+    if (speedSel.value === "on" && startAt){
+      timerEl.textContent = `⏱ ${formatTime(Date.now()-startAt)}（おつかれ！）`;
+    }
   }
 
+  // Buttons
   document.getElementById("makeBtn").addEventListener("click", () => {
+    applySettings();
     problems = generateProblems();
     render();
   });
+
   document.getElementById("checkBtn").addEventListener("click", check);
+
   document.getElementById("toggleAnsBtn").addEventListener("click", () => {
     elAnswers.style.display = (elAnswers.style.display === "none") ? "block" : "none";
   });
+
   document.getElementById("printBtn").addEventListener("click", () => window.print());
 
+  // 設定変更 → 次の「作る」で反映（いきなり問題が変わると混乱するので）
+  [countSel, divSel, qSel, speedSel].forEach(el=>{
+    el.addEventListener("change", ()=>{
+      // タイマーだけは即反映
+      if(el === speedSel) startTimer();
+    });
+  });
+
   // 初期表示
+  applySettings();
   problems = generateProblems();
   render();
 </script>
