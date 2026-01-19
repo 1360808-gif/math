@@ -23,6 +23,18 @@ body{
 }
 .wrap{ max-width:1200px; margin:16px auto; padding:0 12px 40px; }
 
+/* ====== レイアウト：左(タイトル+問題) / 右(手書き) ======
+   左の右端を固定し、余った幅は右が広がる */
+.layout{
+  display:grid;
+  grid-template-columns: minmax(560px, 760px) 1fr; /* 左を一定範囲、右は可変で広がる */
+  gap:12px;
+  align-items:start;
+}
+@media(max-width:980px){
+  .layout{ grid-template-columns:1fr; }
+}
+
 .top{
   background:#fff;
   border:1px solid var(--line);
@@ -45,6 +57,7 @@ h1{ margin:0 0 8px; font-size:22px; }
   align-items:center;
   flex-wrap:wrap;
 }
+
 button{
   padding:9px 12px;
   border-radius:12px;
@@ -60,16 +73,6 @@ button.primary{
 }
 button:active{ transform: translateY(1px); }
 
-.main{
-  margin-top:16px;
-  display:grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap:12px;
-}
-@media(max-width:980px){
-  .main{ grid-template-columns:1fr; }
-}
-
 .panel{
   background:#fff;
   border:1px solid var(--line);
@@ -78,6 +81,7 @@ button:active{ transform: translateY(1px); }
   box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
+/* 問題グリッド */
 .grid{
   margin-top:12px;
   display:grid;
@@ -144,18 +148,16 @@ button:active{ transform: translateY(1px); }
 }
 .answerBox.ok .circle{ display:block; }
 
+/* 押してる間の答え表示中 */
+.answerBox.revealing input{ background:#f8fafc; }
+
 .remLabel{
   font-size:14px;
   font-weight:1000;
   opacity:.85;
 }
 
-/* 押してる間の表示中は少し薄く（答え見てる感） */
-.answerBox.revealing input{
-  background:#f8fafc;
-}
-
-/* 小さい2行ボタン */
+/* 小さい2行ボタン（押している間だけ答え表示） */
 .smallBtn{
   width:60px;
   height:38px;
@@ -188,7 +190,7 @@ button:active{ transform: translateY(1px); }
   font-size:18px;
 }
 
-/* 手書き */
+/* ===== 手書き ===== */
 .boardHeader{
   display:flex;
   align-items:center;
@@ -220,7 +222,7 @@ button:active{ transform: translateY(1px); }
 }
 #board{
   width:100%;
-  height:520px;
+  height:640px; /* 右が広がるので少し高めでも使いやすい */
   display:block;
   touch-action:none;
   background:
@@ -240,25 +242,30 @@ button:active{ transform: translateY(1px); }
 <body>
 <div class="wrap">
 
-  <div class="top">
-    <h1>あまりのある わり算（3年生）</h1>
+  <div class="layout">
 
-    <div class="controlsRow">
-      <div class="controlsLeft">
-        <button class="primary" id="checkBtn">こたえあわせ</button>
+    <!-- 左カラム：タイトル＋問題（右端を揃える） -->
+    <div class="leftCol">
+      <div class="top">
+        <h1>あまりのある わり算（3年生）</h1>
+
+        <div class="controlsRow">
+          <div class="controlsLeft">
+            <button class="primary" id="checkBtn">こたえあわせ</button>
+          </div>
+          <div class="controlsRight">
+            <button id="makeBtn">もんだいをつくる</button>
+          </div>
+        </div>
       </div>
-      <div class="controlsRight">
-        <button id="makeBtn">もんだいをつくる</button>
+
+      <div class="panel" style="margin-top:12px;">
+        <div class="grid" id="qs"></div>
+        <div class="score" id="score">点数：— / 100</div>
       </div>
     </div>
-  </div>
 
-  <div class="main">
-    <div class="panel">
-      <div class="grid" id="qs"></div>
-      <div class="score" id="score">点数：— / 100</div>
-    </div>
-
+    <!-- 右カラム：手書き（余った幅で広がる） -->
     <div class="panel">
       <div class="boardHeader">
         <div class="boardTitle">✍ 手書き計算スペース</div>
@@ -275,7 +282,8 @@ button:active{ transform: translateY(1px); }
 
       <div class="boardHint">※ 指でも書けます。消しゴムは「消しゴム」ボタンで切り替え。</div>
     </div>
-  </div>
+
+  </div><!-- /layout -->
 
 </div>
 
@@ -356,7 +364,6 @@ function render(){
     let savedR = "";
 
     function showAnswer(){
-      // すでに表示中なら何もしない
       if(holdBtn.dataset.holding === "1") return;
       holdBtn.dataset.holding = "1";
 
@@ -366,7 +373,6 @@ function render(){
       qInput.value = String(p.q);
       rInput.value = String(p.r);
 
-      // 触れないように
       qInput.readOnly = true;
       rInput.readOnly = true;
 
@@ -388,16 +394,16 @@ function render(){
       rBox.classList.remove("revealing");
     }
 
-    // マウス：押したら表示、離したら非表示
+    // マウス
     holdBtn.addEventListener("mousedown", (e)=>{ e.preventDefault(); showAnswer(); });
     window.addEventListener("mouseup", hideAnswer);
 
-    // タッチ：押したら表示、離したら非表示
+    // タッチ
     holdBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); showAnswer(); }, {passive:false});
     holdBtn.addEventListener("touchend", (e)=>{ e.preventDefault(); hideAnswer(); }, {passive:false});
     holdBtn.addEventListener("touchcancel", hideAnswer);
 
-    // ボタン外に指が出た時も戻す（保険）
+    // ふいに外れた時の保険
     holdBtn.addEventListener("mouseleave", hideAnswer);
   });
 
