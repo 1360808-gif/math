@@ -18,7 +18,6 @@
       --shadow: 0 10px 24px rgba(0,0,0,.08);
       --radius: 18px;
     }
-
     *{ box-sizing: border-box; }
     body{
       margin:0;
@@ -29,7 +28,6 @@
       color: var(--ink);
       line-height: 1.6;
     }
-
     .wrap{ max-width: 980px; margin: 18px auto; padding: 0 14px 40px; }
 
     .top{
@@ -43,7 +41,6 @@
       z-index: 5;
       backdrop-filter: blur(6px);
     }
-
     .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .spacer{ flex:1; min-width: 120px; }
 
@@ -55,7 +52,6 @@
       align-items:center;
       gap:10px;
     }
-
     .badge{
       font-size: 12px;
       background: #eef2ff;
@@ -63,14 +59,14 @@
       padding: 4px 10px;
       border-radius: 999px;
       color: #3730a3;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .controls button{
       border: 0;
       padding: 10px 12px;
       border-radius: 14px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: .02em;
       cursor: pointer;
       box-shadow: 0 6px 14px rgba(79,70,229,.14);
@@ -85,14 +81,14 @@
     }
     .controls button:active{ transform: translateY(1px); }
 
-    .hint{ color: var(--muted); font-size: 13px; }
+    .hint{ color: var(--muted); font-size: 13px; font-weight: 800; }
     .meta{
       margin-top: 10px;
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .panel{
@@ -105,7 +101,6 @@
       .panel{ grid-template-columns: 1fr; }
       .top{ position: static; }
     }
-
     .card{
       background: var(--card);
       border: 1px solid var(--line);
@@ -114,6 +109,67 @@
       padding: 14px;
     }
 
+    /* ===== ねこエリア ===== */
+    .mascotRow{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .mascot{
+      display:flex;
+      align-items:flex-end;
+      gap: 10px;
+      flex: 1;
+      min-width: 260px;
+    }
+    .cat{
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 16px rgba(0,0,0,.07);
+      display:grid;
+      place-items:center;
+      font-size: 34px;
+      user-select: none;
+    }
+    .bubble{
+      position: relative;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: 0 10px 18px rgba(0,0,0,.05);
+      font-weight: 900;
+      color: var(--ink);
+      flex: 1;
+      min-width: 200px;
+    }
+    .bubble::before{
+      content:"";
+      position:absolute;
+      left:-8px;
+      bottom: 18px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-left: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      transform: rotate(45deg);
+    }
+    .bubble small{
+      display:block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    /* ===== 進み/点数 ===== */
     .progressBox{
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     }
@@ -132,12 +188,9 @@
       background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
       transition: width .25s ease;
     }
-    .score{
-      font-weight: 900;
-      font-size: 16px;
-    }
+    .score{ font-weight: 1000; font-size: 16px; }
     .praise{
-      font-weight: 900;
+      font-weight: 1000;
       padding: 8px 10px;
       border-radius: 14px;
       background: #f0fdf4;
@@ -146,16 +199,15 @@
       display:none;
     }
 
-    .settings{
-      display:flex; gap:10px; align-items:end; flex-wrap:wrap;
-    }
+    /* ===== 設定 ===== */
+    .settings{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
     label{
       display:flex;
       flex-direction: column;
       gap: 6px;
       font-size: 13px;
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 900;
     }
     select, input[type="number"]{
       padding: 10px 10px;
@@ -166,8 +218,8 @@
       color: var(--ink);
       width: 140px;
     }
-    .tiny{ width: 110px; }
 
+    /* ===== 問題カード ===== */
     .grid{
       margin-top: 12px;
       display:grid;
@@ -204,13 +256,13 @@
     .status{
       font-size: 12px;
       color: var(--muted);
-      font-weight: 900;
+      font-weight: 1000;
       flex: none;
     }
 
     .expr{
       font-size: 20px;
-      font-weight: 900;
+      font-weight: 1000;
       letter-spacing: .02em;
       display:flex;
       align-items:center;
@@ -225,12 +277,12 @@
       flex-wrap: wrap;
       margin-top: 8px;
       color: var(--muted);
-      font-weight: 900;
+      font-weight: 1000;
     }
     .ans input{
       width: 88px;
       font-size: 18px;
-      font-weight: 900;
+      font-weight: 1000;
       text-align: center;
       padding: 10px 8px;
       border-radius: 14px;
@@ -256,9 +308,9 @@
     .answers h2{ margin: 0 0 8px; font-size: 18px; }
     .ansList{ columns: 2; column-gap: 18px; }
     @media (max-width: 720px){ .ansList{ columns: 1; } }
-    .ansList div{ break-inside: avoid; margin: 0 0 6px; color: var(--muted); font-weight: 800; }
+    .ansList div{ break-inside: avoid; margin: 0 0 6px; color: var(--muted); font-weight: 900; }
 
-    /* 画面演出（紙には出さない） */
+    /* ===== 紙吹雪 ===== */
     .confetti{
       position: fixed;
       inset: 0;
@@ -280,7 +332,7 @@
 
     @media print{
       body{ background:#fff; }
-      .top, .panel .card:last-child, .confetti{ display:none !important; }
+      .top, .panel .card:last-child, .confetti, .mascotRow{ display:none !important; }
       .wrap{ max-width: none; margin: 0; padding: 0; }
       .card{ box-shadow:none; border:none; }
       .q{ break-inside: avoid; box-shadow:none; }
@@ -314,6 +366,18 @@
           <div>年：_____　組：_____</div>
           <div>名前：________________</div>
         </div>
+      </div>
+
+      <!-- ねこ応援 -->
+      <div class="mascotRow">
+        <div class="mascot">
+          <div class="cat" id="catFace" aria-label="わり算ねこ">🐱</div>
+          <div class="bubble" id="catBubble">
+            よーし！いっしょに がんばろう！
+            <small id="catSub">（Enterでつぎにすすむよ）</small>
+          </div>
+        </div>
+        <div class="hint" id="timer" style="font-weight:1000;">⏱ 0:00</div>
       </div>
     </div>
 
@@ -357,15 +421,14 @@
           </label>
 
           <label>
-            スピード
+            タイマー
             <select id="speedSel">
               <option value="off" selected>オフ</option>
-              <option value="on">タイマーON</option>
+              <option value="on">ON</option>
             </select>
           </label>
-
-          <div class="hint" id="timer" style="font-weight:1000;">⏱ 0:00</div>
         </div>
+        <div class="hint" style="margin-top:10px;">🐾 むずかしいときは「わる数」を2〜5にしてね</div>
       </div>
     </div>
 
@@ -378,12 +441,6 @@
   </div>
 
 <script>
-  // ========== 3年生向け最適化 ==========
-  // ・入力しやすいUI（大きめ、中央寄せ）
-  // ・進み具合バー
-  // ・全部正解/高得点で紙吹雪
-  // ・設定で難易度を軽く調整できる
-
   let problems = [];
   let QUESTION_COUNT = 20;
   let DIV_MIN = 2, DIV_MAX = 9;
@@ -398,6 +455,11 @@
   const elPraise = document.getElementById("praise");
   const elConfetti = document.getElementById("confetti");
 
+  // ねこ
+  const catFace = document.getElementById("catFace");
+  const catBubble = document.getElementById("catBubble");
+  const catSub = document.getElementById("catSub");
+
   const countSel = document.getElementById("countSel");
   const divSel = document.getElementById("divSel");
   const qSel = document.getElementById("qSel");
@@ -407,9 +469,7 @@
   let timerId = null;
   let startAt = null;
 
-  function randInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+  function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
   function parseRange(str){
     const [a,b] = str.split("-").map(Number);
@@ -418,24 +478,18 @@
 
   function applySettings(){
     QUESTION_COUNT = Number(countSel.value);
-
-    const d = parseRange(divSel.value);
-    DIV_MIN = d.min; DIV_MAX = d.max;
-
-    const q = parseRange(qSel.value);
-    Q_MIN = q.min; Q_MAX = q.max;
+    const d = parseRange(divSel.value); DIV_MIN = d.min; DIV_MAX = d.max;
+    const q = parseRange(qSel.value);   Q_MIN = q.min; Q_MAX = q.max;
   }
 
   function generateProblems() {
     const set = new Set();
     const out = [];
-
     while (out.length < QUESTION_COUNT) {
-      const b = randInt(DIV_MIN, DIV_MAX);      // わる数
-      const q = randInt(Q_MIN, Q_MAX);          // しょう
-      const r = randInt(1, b - 1);              // あまり（必ずある）
+      const b = randInt(DIV_MIN, DIV_MAX);
+      const q = randInt(Q_MIN, Q_MAX);
+      const r = randInt(1, b - 1);   // あまりは必ずある
       const a = b * q + r;
-
       const key = `${a}/${b}`;
       if (set.has(key)) continue;
       set.add(key);
@@ -461,9 +515,25 @@
       }, 250);
     }
   }
-  function stopTimer(){
-    if (timerId) clearInterval(timerId);
-    timerId = null;
+  function stopTimer(){ if (timerId) clearInterval(timerId); timerId = null; }
+
+  // ===== ねこのセリフ管理 =====
+  const CAT = {
+    idle:  {face:"🐱", text:"よーし！いっしょに がんばろう！", sub:"（Enterでつぎへ）"},
+    start: {face:"😺", text:"スタート！あわてず ていねいにね！", sub:""},
+    mid:   {face:"😼", text:"いいペース！このちょうし！", sub:""},
+    near:  {face:"😸", text:"あとすこし！さいごまで いける！", sub:""},
+    all:   {face:"😻", text:"ぜんぶ うまった！こたえあわせ してみよ！", sub:""},
+    low:   {face:"🐱", text:"だいじょうぶ！まちがいは のびしろ！", sub:"もういちど やってみよう"},
+    midScore:{face:"😺", text:"いいね！まちがいを なおせば もっといける！", sub:""},
+    high:  {face:"😸", text:"すごい！ほとんど できてる！", sub:""},
+    perfect:{face:"😻", text:"かんぺき！！ぜんぶ せいかい！！", sub:""}
+  };
+
+  function setCat(mode){
+    catFace.textContent = mode.face;
+    catBubble.firstChild.nodeValue = mode.text;
+    catSub.textContent = mode.sub || "";
   }
 
   function updateProgress(){
@@ -479,6 +549,13 @@
     elProg.textContent = `進み：${filled} / ${QUESTION_COUNT}`;
     const pct = Math.round((filled/QUESTION_COUNT)*100);
     elBar.style.width = `${pct}%`;
+
+    // ねこの励まし（進みぐあい）
+    if (filled === 0) setCat(CAT.start);
+    else if (filled < Math.ceil(QUESTION_COUNT*0.5)) setCat(CAT.start);
+    else if (filled < Math.ceil(QUESTION_COUNT*0.85)) setCat(CAT.mid);
+    else if (filled < QUESTION_COUNT) setCat(CAT.near);
+    else setCat(CAT.all);
   }
 
   function setPraise(text, show=true){
@@ -489,8 +566,6 @@
   function popConfetti(){
     elConfetti.innerHTML = "";
     elConfetti.style.display = "block";
-
-    // 色はCSSで指定しない約束に近いけど、ここは演出なので最小限で
     const colors = ["#4f46e5","#06b6d4","#22c55e","#f59e0b","#ef4444"];
     const n = 60;
     for(let i=0;i<n;i++){
@@ -540,14 +615,12 @@
     elScore.textContent = "点数：— / 100";
     elAnswers.style.display = "none";
     setPraise("", false);
-    updateProgress();
+    setCat(CAT.idle);
     startTimer();
 
-    // 入力で進み更新
     elQs.querySelectorAll("input").forEach(inp=>{
       inp.addEventListener("input", updateProgress);
       inp.addEventListener("keydown", (e)=>{
-        // Enterで次へ（3年生でも使いやすい）
         if(e.key === "Enter"){
           const all = Array.from(elQs.querySelectorAll("input"));
           const idx = all.indexOf(e.target);
@@ -555,13 +628,14 @@
         }
       });
     });
+
+    updateProgress();
   }
 
   function check() {
     const boxes = Array.from(document.querySelectorAll(".q"));
     const pointPer = 100 / QUESTION_COUNT;
     let score = 0;
-    let perfect = true;
 
     boxes.forEach((box, i) => {
       const qIn = box.querySelector(".ansQ");
@@ -576,56 +650,50 @@
       box.classList.add(ok ? "ok" : "ng");
       box.querySelector(".status").textContent = ok ? "せいかい！⭐" : "ざんねん…";
       if (ok) score += pointPer;
-      if (!ok) perfect = false;
     });
 
     const s = Math.round(score);
     elScore.textContent = `点数：${s} / 100`;
 
-    // ほめ言葉（3年生向け）
     if (s === 100){
       setPraise("かんぺき！！ ぜんぶせいかい！🎉");
+      setCat(CAT.perfect);
       popConfetti();
     } else if (s >= 90){
       setPraise("すごい！もうちょっとでかんぺき！✨");
+      setCat(CAT.high);
       popConfetti();
     } else if (s >= 70){
       setPraise("いいね！まちがいをなおしてみよう！");
+      setCat(CAT.midScore);
     } else {
       setPraise("だいじょうぶ！ゆっくりやればできるよ！");
+      setCat(CAT.low);
     }
 
-    // タイマー停止（ONのときだけ見せる）
     stopTimer();
     if (speedSel.value === "on" && startAt){
       timerEl.textContent = `⏱ ${formatTime(Date.now()-startAt)}（おつかれ！）`;
     }
   }
 
-  // Buttons
   document.getElementById("makeBtn").addEventListener("click", () => {
     applySettings();
     problems = generateProblems();
     render();
   });
-
   document.getElementById("checkBtn").addEventListener("click", check);
-
   document.getElementById("toggleAnsBtn").addEventListener("click", () => {
     elAnswers.style.display = (elAnswers.style.display === "none") ? "block" : "none";
   });
-
   document.getElementById("printBtn").addEventListener("click", () => window.print());
 
-  // 設定変更 → 次の「作る」で反映（いきなり問題が変わると混乱するので）
   [countSel, divSel, qSel, speedSel].forEach(el=>{
     el.addEventListener("change", ()=>{
-      // タイマーだけは即反映
       if(el === speedSel) startTimer();
     });
   });
 
-  // 初期表示
   applySettings();
   problems = generateProblems();
   render();
