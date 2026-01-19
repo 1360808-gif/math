@@ -15,17 +15,18 @@
       --good:#16a34a;
       --bad:#dc2626;
       --accent:#4f46e5;
-      --accent2:#06b6d4;
       --shadow:0 10px 24px rgba(0,0,0,.08);
       --radius:18px;
     }
     *{ box-sizing:border-box; }
+
     body{
       margin:0;
       font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
       background:var(--bg);
       color:var(--ink);
     }
+
     .wrap{ max-width:980px; margin:16px auto; padding:0 12px 40px; }
 
     .top{
@@ -35,7 +36,9 @@
       padding:14px;
       box-shadow:var(--shadow);
     }
+
     h1{ margin:0 0 6px; font-size:22px; }
+
     .controls button{
       margin:4px 4px 0 0;
       padding:8px 12px;
@@ -88,14 +91,16 @@
       grid-template-columns:repeat(2,1fr);
       gap:12px;
     }
-    @media(max-width:700px){ .grid{ grid-template-columns:1fr; } }
+    @media(max-width:700px){
+      .grid{ grid-template-columns:1fr; }
+    }
 
     .q{
       position:relative;
       background:#fff;
       border:1px solid var(--line);
       border-radius:18px;
-      padding:12px;
+      padding:14px;
       box-shadow:0 6px 12px rgba(0,0,0,.06);
     }
 
@@ -117,27 +122,24 @@
       transform:rotate(-10deg);
       display:none;
     }
-
     .q.ok .maru{ display:grid; }
 
-    .expr{
+    /* === 式と回答を横並び === */
+    .line{
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:8px;
       font-size:20px;
       font-weight:900;
     }
 
-    .ans{
-      margin-top:8px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      font-weight:900;
-    }
-    .ans input{
-      width:70px;
-      padding:8px;
+    .line input{
+      width:64px;
+      padding:6px;
       font-size:18px;
       text-align:center;
-      border-radius:12px;
+      border-radius:10px;
       border:2px solid var(--line);
     }
 
@@ -182,7 +184,7 @@
 </div>
 
 <script>
-/* ========= 共通 ========= */
+/* 全角→半角 */
 function toHalfWidth(str){
   return str.replace(/[０-９]/g, s =>
     String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
@@ -192,18 +194,18 @@ function rand(min,max){
   return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-/* ========= 今日のミッション ========= */
+/* 今日のミッション */
 const missions=[
   "10もん せいかいしよう！",
   "わる数が 2〜5 の もんだいに ちょうせん！",
   "まちがえずに 5もん つづけて とこう！",
   "ゆっくり ていねいに ぜんぶ やろう！"
 ];
-const todayMission = missions[new Date().getDate() % missions.length];
 document.getElementById("mission").textContent =
-  "🐾 きょうのミッション： " + todayMission;
+  "🐾 きょうのミッション： " +
+  missions[new Date().getDate() % missions.length];
 
-/* ========= 問題生成 ========= */
+/* 問題 */
 let problems=[];
 const QNUM=10;
 
@@ -231,11 +233,15 @@ function render(){
     d.className="q";
     d.innerHTML=`
       <div class="maru">⭕</div>
-      <div class="expr">${p.a} ÷ ${p.b} =</div>
-      <div class="ans">
-        しょう <input class="ansQ">
-        あまり <input class="ansR">
+
+      <div class="line">
+        ${p.a} ÷ ${p.b} ＝
+        <span>しょう</span>
+        <input class="ansQ">
+        <span>あまり</span>
+        <input class="ansR">
       </div>
+
       <div class="status">まだ</div>
     `;
     qs.appendChild(d);
@@ -251,24 +257,24 @@ function render(){
   document.getElementById("score").textContent="点数：— / 100";
 }
 
-/* ========= こたえあわせ ========= */
+/* こたえあわせ */
 function check(){
   const cards=document.querySelectorAll(".q");
   let score=0;
   cards.forEach((card,i)=>{
-    const qIn=card.querySelector(".ansQ");
-    const rIn=card.querySelector(".ansR");
-    const uq=Number(qIn.value);
-    const ur=Number(rIn.value);
+    const uq=Number(card.querySelector(".ansQ").value);
+    const ur=Number(card.querySelector(".ansR").value);
     const ok=(uq===problems[i].q && ur===problems[i].r);
+
     card.classList.remove("ok","ng");
     card.classList.add(ok?"ok":"ng");
-    card.querySelector(".status").textContent=
+    card.querySelector(".status").textContent =
       ok?"せいかい！":"ざんねん…";
+
     if(ok) score+=10;
   });
 
-  document.getElementById("score").textContent=
+  document.getElementById("score").textContent =
     `点数：${score} / 100`;
 
   const cat=document.getElementById("cat");
@@ -285,7 +291,7 @@ function check(){
   }
 }
 
-/* ========= 初期化 ========= */
+/* 初期化 */
 document.getElementById("makeBtn").onclick=()=>{
   problems=makeProblems();
   render();
