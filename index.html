@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>あまりのある わり算</title>
+<title>あまりのある わり算（3年生）</title>
 
 <style>
 :root{
@@ -72,6 +72,19 @@ body{
 .bestBox .value{ font-size:20px; letter-spacing:.4px; }
 /* bestOff は使わない（残してもOKだけど、今後一切付けない） */
 .bestOff{ display:none; }
+
+/* ★ベスト消去ボタン */
+.bestClearBtn{
+  padding:6px 8px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+  line-height:1;
+}
+.bestClearBtn:hover{ background:#fee2e2; }
+.bestClearBtn:active{ transform: translateY(1px); }
 
 /* ===== 上部：1行（ボタン類） ===== */
 .controlsRow{
@@ -355,8 +368,12 @@ button:active{ transform: translateY(1px); }
 
         <!-- タイトル行：右にベスト -->
         <div class="titleRow">
-          <h1>あまりのある わり算</h1>
+          <h1>あまりのある わり算（3年生）</h1>
+
           <div class="bestBox" id="bestInline" aria-live="polite" title="ベストタイム（この端末に保存）">
+            <!-- ★ベスト消去ボタン（左） -->
+            <button id="clearBestBtn" class="bestClearBtn" type="button" title="ベストをけす">🗑</button>
+
             <span class="label">🏆 ベスト</span>
             <span class="value" id="bestText">—</span>
             <span class="label">びょう</span>
@@ -453,6 +470,22 @@ function tryUpdateBest(sec){
     localStorage.setItem(BEST_KEY, String(sec));
     showBest();
   }
+}
+
+/* ★ベストを消す */
+function clearBest(){
+  if(confirm("ベストタイムをけしますか？")){
+    try{
+      localStorage.removeItem(BEST_KEY);
+    }catch(e){
+      // localStorage が使えない/禁止されている環境でも落とさない
+    }
+    showBest();
+  }
+}
+const clearBestBtn = document.getElementById("clearBestBtn");
+if(clearBestBtn){
+  clearBestBtn.addEventListener("click", clearBest);
 }
 
 /* ===== 全問タイマー（自動） ===== */
@@ -792,5 +825,3 @@ window.addEventListener("resize", resizeCanvas);
 </script>
 </body>
 </html>
-
-
