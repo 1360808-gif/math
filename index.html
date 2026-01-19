@@ -23,10 +23,12 @@ body{
 }
 .wrap{ max-width:1200px; margin:16px auto; padding:0 12px 40px; }
 
+/* 左：タイトル+問題 / 右：手書き */
 .layout{
   display:grid;
   grid-template-columns: minmax(560px, 760px) 1fr;
   gap:12px;
+  align-items:start;
 }
 @media(max-width:980px){
   .layout{ grid-template-columns:1fr; }
@@ -40,18 +42,21 @@ body{
   box-shadow:var(--shadow);
 }
 
-/* タイトル行 */
+/* ===== タイトル行（ここにベスト） ===== */
 .titleRow{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:nowrap;
 }
 .titleRow h1{
   margin:0;
   font-size:22px;
+  white-space:nowrap;
 }
 
-/* ベストタイム（常に表示） */
+/* ベストタイム表示（常に表示） */
 .bestBox{
   display:inline-flex;
   align-items:baseline;
@@ -61,17 +66,29 @@ body{
   border:1px dashed rgba(79,70,229,.55);
   background:#fbfbff;
   font-weight:1000;
+  white-space:nowrap;
 }
-.bestBox .label{ font-size:13px; }
-.bestBox .value{ font-size:20px; }
+.bestBox .label{ font-size:13px; opacity:.85; }
+.bestBox .value{ font-size:20px; letter-spacing:.4px; }
+/* bestOff は使わない（残してもOKだけど、今後一切付けない） */
+.bestOff{ display:none; }
 
-/* 上部操作行 */
+/* ===== 上部：1行（ボタン類） ===== */
 .controlsRow{
   margin-top:10px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
   gap:10px;
+  flex-wrap:nowrap;         /* 1行固定 */
+  overflow-x:auto;          /* 狭い時は横スクロール */
+  -webkit-overflow-scrolling:touch;
+}
+.controlsLeft, .controlsRight{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:nowrap;
 }
 
 button{
@@ -84,39 +101,70 @@ button{
 }
 button.primary{
   background:var(--accent);
+  border-color:transparent;
   color:#fff;
-  border:none;
+}
+button:active{ transform: translateY(1px); }
+
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
+/* ===== タイム表示（上部1行内） ===== */
 .timerInline{
   display:flex;
   align-items:center;
   gap:10px;
+  flex:0 0 auto;
+  white-space:nowrap;
 }
 .timer{
-  display:flex;
-  gap:6px;
+  display:inline-flex;
+  align-items:baseline;
+  gap:8px;
   padding:8px 12px;
   border-radius:14px;
   border:1px solid var(--line);
   background:#f8fafc;
   font-weight:1000;
 }
+.timer .label{ font-size:13px; opacity:.85; }
+.timer .value{ font-size:20px; letter-spacing:.5px; }
 .timer.running{
-  border-color:var(--accent);
+  border-color: rgba(79,70,229,.45);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+}
+.hint{
+  color:#6b7280;
+  font-weight:800;
+  font-size:13px;
 }
 .timerOff{
   display:none;
 }
 
+/* 計測ON/OFFスイッチ */
 .switch{
-  display:flex;
+  display:inline-flex;
   align-items:center;
   gap:6px;
+  padding:7px 10px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#fff;
   font-weight:900;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  white-space:nowrap;
 }
+.switch input{ accent-color: var(--accent); }
 
-/* 問題 */
+/* ===== 問題 ===== */
 .grid{
   margin-top:12px;
   display:grid;
@@ -126,52 +174,95 @@ button.primary{
 @media(max-width:700px){
   .grid{ grid-template-columns:1fr; }
 }
+
 .q{
   background:#fff;
   border:1px solid var(--line);
   border-radius:18px;
   padding:12px;
+  box-shadow:0 6px 12px rgba(0,0,0,.06);
+  overflow:visible;
 }
 .qRow{
   display:flex;
   align-items:center;
   gap:10px;
+  overflow:visible;
 }
 .qInline{
   display:flex;
   align-items:center;
   gap:8px;
   flex:1;
+  min-width:0;
+  white-space:nowrap;
+  overflow:visible; /* 丸が欠けない */
 }
 .expr{
-  font-weight:1000;
   font-size:18px;
+  font-weight:1000;
 }
 
 .answerBox{
   position:relative;
+  display:inline-block;
+  flex:none;
+  overflow:visible;
 }
 .answerBox input{
   width:54px;
-  text-align:center;
+  padding:6px 6px;
   font-size:17px;
+  text-align:center;
   border-radius:10px;
   border:2px solid var(--line);
+  background:#fff;
+  position:relative;
+  z-index:1;
 }
+
+.hankakuWarn{
+  position:absolute;
+  top:-26px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#fee2e2;
+  color:#b91c1c;
+  font-size:12px;
+  font-weight:900;
+  padding:4px 8px;
+  border-radius:8px;
+  white-space:nowrap;
+  box-shadow:0 4px 8px rgba(0,0,0,.12);
+  display:none;
+  z-index:20;
+}
+.answerBox.warn .hankakuWarn{ display:block; }
+
 .mark{
   position:absolute;
   top:50%;
   left:50%;
   width:46px;
   height:46px;
-  border:4px solid rgba(239,68,68,.7);
+  border:4px solid rgba(239,68,68,0.7);
   border-radius:50%;
-  transform:translate(-50%,-50%);
-  display:none;
+  transform:translate(-50%, -50%);
   pointer-events:none;
+  display:none;
+  z-index:9999;
 }
 .answerBox.ok .mark{ display:block; }
 
+.answerBox.revealing input{ background:#f8fafc; }
+
+.remLabel{
+  font-size:14px;
+  font-weight:1000;
+  opacity:.85;
+}
+
+/* こたえをみる（2行） */
 .smallBtn{
   width:60px;
   height:38px;
@@ -180,8 +271,23 @@ button.primary{
   background:#fff;
   display:grid;
   place-items:center;
+  cursor:pointer;
+  flex:none;
+  padding:0;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+}
+.smallBtn span{
+  display:block;
+  line-height:1.05;
   font-size:12px;
   font-weight:1000;
+}
+.smallBtn:active{ transform: translateY(1px); }
+
+@media(max-width:360px){
+  .qInline{ white-space:normal; }
 }
 
 .score{
@@ -190,31 +296,67 @@ button.primary{
   font-size:18px;
 }
 
-/* 手書き */
-.panel{
-  background:#fff;
+/* ===== 手書き ===== */
+.boardHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.boardTitle{ font-weight:1000; font-size:16px; }
+.boardTools{ display:flex; gap:8px; flex-wrap:wrap; }
+.toolBtn{
+  padding:8px 10px;
+  border-radius:12px;
   border:1px solid var(--line);
-  border-radius:18px;
-  padding:14px;
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.toolBtn.active{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+}
+.canvasWrap{
+  border:2px dashed #cbd5e1;
+  border-radius:16px;
+  background:#fff;
+  overflow:hidden;
+  position:relative;
 }
 #board{
   width:100%;
   height:640px;
-  border:2px dashed #cbd5e1;
-  border-radius:16px;
+  display:block;
+  touch-action:none;
+  background:
+    linear-gradient(#f9fafb 1px, transparent 1px),
+    linear-gradient(90deg, #f9fafb 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.boardHint{
+  margin-top:10px;
+  color:#6b7280;
+  font-weight:800;
+  font-size:13px;
 }
 </style>
 </head>
 
 <body>
 <div class="wrap">
+
   <div class="layout">
 
-    <div>
+    <div class="leftCol">
       <div class="top">
+
+        <!-- タイトル行：右にベスト -->
         <div class="titleRow">
           <h1>あまりのある わり算（3年生）</h1>
-          <div class="bestBox">
+          <div class="bestBox" id="bestInline" aria-live="polite" title="ベストタイム（この端末に保存）">
             <span class="label">🏆 ベスト</span>
             <span class="value" id="bestText">—</span>
             <span class="label">びょう</span>
@@ -222,20 +364,24 @@ button.primary{
         </div>
 
         <div class="controlsRow">
-          <button class="primary" id="checkBtn">こたえあわせ</button>
-
-          <div class="timerInline" id="timerInline">
-            <div class="timer" id="timerBox">
-              <span>⏱</span>
-              <span id="timerText">0.0</span>
-              <span>びょう</span>
-            </div>
-            <div id="timerHint">「もんだいをつくる」でスタート</div>
+          <div class="controlsLeft">
+            <button class="primary" id="checkBtn">こたえあわせ</button>
           </div>
 
-          <div class="switch">
-            <input type="checkbox" id="timingToggle" checked>
-            タイム
+          <div class="timerInline" id="timerInline">
+            <div class="timer" id="timerBox" aria-live="polite">
+              <span class="label">⏱ タイム</span>
+              <span class="value" id="timerText">0.0</span>
+              <span class="label">びょう</span>
+            </div>
+            <div class="hint" id="timerHint">「もんだいをつくる」でスタート</div>
+          </div>
+
+          <div class="controlsRight">
+            <label class="switch" title="タイムを計測する/しない">
+              <input type="checkbox" id="timingToggle" checked>
+              タイム
+            </label>
             <button id="makeBtn">もんだいをつくる</button>
           </div>
         </div>
@@ -248,44 +394,401 @@ button.primary{
     </div>
 
     <div class="panel">
-      <canvas id="board"></canvas>
+      <div class="boardHeader">
+        <div class="boardTitle">✍ 手書き計算スペース</div>
+        <div class="boardTools">
+          <button class="toolBtn active" id="penBtn">ペン</button>
+          <button class="toolBtn" id="eraserBtn">消しゴム</button>
+          <button class="toolBtn" id="clearBtn">ぜんぶけす</button>
+        </div>
+      </div>
+
+      <div class="canvasWrap">
+        <canvas id="board"></canvas>
+      </div>
+
+      <div class="boardHint">※ 「こたえをみる」は長押ししているあいだだけ見えます。</div>
     </div>
 
   </div>
 </div>
 
 <script>
-const BEST_KEY="warizan_best_sec_v1";
-const bestText=document.getElementById("bestText");
+function toHalfWidth(str){
+  return str.replace(/[０-９]/g, s =>
+    String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+  );
+}
+function rand(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
 
+let problems=[];
+const QNUM=10;
+const LONG_PRESS_MS = 350;
+
+/* ===== タイム計測 ON/OFF ===== */
+let timingEnabled = true;
+const timingToggle = document.getElementById("timingToggle");
+const timerInline = document.getElementById("timerInline");
+
+/* ===== ベストタイム（localStorage） ===== */
+const BEST_KEY = "warizan_best_sec_v1";
+const bestInline = document.getElementById("bestInline");
+const bestText = document.getElementById("bestText");
+
+function loadBest(){
+  const v = localStorage.getItem(BEST_KEY);
+  if(!v) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
 function showBest(){
-  const v=localStorage.getItem(BEST_KEY);
-  bestText.textContent=v?Number(v).toFixed(1):"—";
+  const best = loadBest();
+  bestText.textContent = (best==null) ? "—" : best.toFixed(1);
 }
 function tryUpdateBest(sec){
-  const v=localStorage.getItem(BEST_KEY);
-  if(!v||sec<Number(v)){
-    localStorage.setItem(BEST_KEY,sec);
+  const best = loadBest();
+  if(best==null || sec < best){
+    localStorage.setItem(BEST_KEY, String(sec));
     showBest();
   }
 }
 
-let timingEnabled=true;
-const timerInline=document.getElementById("timerInline");
-const timingToggle=document.getElementById("timingToggle");
+/* ===== 全問タイマー（自動） ===== */
+let tStart = null;
+let tStop = null;
+let tTick = null;
 
+const timerBox = document.getElementById("timerBox");
+const timerText = document.getElementById("timerText");
+const timerHint = document.getElementById("timerHint");
+
+function fmtSec(ms){ return (ms/1000).toFixed(1); }
+
+function timerReset(){
+  tStart = null;
+  tStop = null;
+  timerText.textContent = "0.0";
+  timerBox.classList.remove("running");
+  timerHint.textContent = "「もんだいをつくる」でスタート";
+  if(tTick){ clearInterval(tTick); tTick = null; }
+}
+function timerStart(){
+  if(!timingEnabled) return;
+  tStart = performance.now();
+  tStop = null;
+  timerBox.classList.add("running");
+  timerHint.textContent = "ぜんぶ せいかい でストップ！";
+  if(tTick) clearInterval(tTick);
+  tTick = setInterval(()=>{
+    if(tStart==null || tStop!=null) return;
+    timerText.textContent = fmtSec(performance.now() - tStart);
+  }, 100);
+}
+function timerStop(){
+  if(!timingEnabled) return;
+  if(tStart==null || tStop!=null) return;
+
+  tStop = performance.now();
+  const sec = (tStop - tStart) / 1000;
+
+  timerText.textContent = sec.toFixed(1);
+  timerBox.classList.remove("running");
+  timerHint.textContent = "🎉 おわり！もういちど は「もんだいをつくる」";
+  if(tTick){ clearInterval(tTick); tTick = null; }
+
+  // ベスト更新（タイムONのときだけ到達する）
+  tryUpdateBest(sec);
+}
+
+/* ★変更点：ベストはここで一切触らない（常に表示） */
 function setTimingUI(){
-  timingEnabled=timingToggle.checked;
+  timingEnabled = timingToggle.checked;
+
+  timerReset();
+
   if(timingEnabled){
     timerInline.classList.remove("timerOff");
   }else{
     timerInline.classList.add("timerOff");
   }
 }
-timingToggle.addEventListener("change",setTimingUI);
+timingToggle.addEventListener("change", setTimingUI);
 
-showBest();
-setTimingUI();
+function makeProblems(){
+  const out=[], set=new Set();
+  while(out.length<QNUM){
+    const b=rand(2,9), q=rand(2,9), r=rand(1,b-1);
+    const a=b*q+r, key=`${a}/${b}`;
+    if(set.has(key)) continue;
+    set.add(key);
+    out.push({a,b,q,r});
+  }
+  return out;
+}
+
+function render(){
+  const qs=document.getElementById("qs");
+  qs.innerHTML="";
+
+  problems.forEach((p, idx)=>{
+    const d=document.createElement("div");
+    d.className="q";
+    d.innerHTML=`
+      <div class="qRow">
+        <div class="qInline">
+          <span class="expr">${p.a} ÷ ${p.b} ＝</span>
+
+          <span class="answerBox qBox">
+            <span class="hankakuWarn">半角数字で入力してね</span>
+            <input class="ansQ" inputmode="numeric" aria-label="商 ${idx+1}">
+            <span class="mark" aria-hidden="true"></span>
+          </span>
+
+          <span class="remLabel">あまり</span>
+
+          <span class="answerBox rBox">
+            <span class="hankakuWarn">半角数字で入力してね</span>
+            <input class="ansR" inputmode="numeric" aria-label="あまり ${idx+1}">
+            <span class="mark" aria-hidden="true"></span>
+          </span>
+        </div>
+
+        <button class="smallBtn holdAnsBtn" type="button" aria-label="こたえをみる（ながおし）">
+          <span>こたえを</span>
+          <span>みる</span>
+        </button>
+      </div>
+    `;
+    qs.appendChild(d);
+
+    const qInput = d.querySelector(".ansQ");
+    const rInput = d.querySelector(".ansR");
+    const qBox = d.querySelector(".qBox");
+    const rBox = d.querySelector(".rBox");
+    const holdBtn = d.querySelector(".holdAnsBtn");
+
+    // 全角→半角 + 注意表示 + 入力で全問判定
+    [qInput, rInput].forEach(inp=>{
+      inp.addEventListener("input",(e)=>{
+        const box = e.target.parentElement;
+        const before = e.target.value;
+        const after = toHalfWidth(before);
+
+        if(before !== after){
+          box.classList.add("warn");
+          clearTimeout(box._warnTimer);
+          box._warnTimer = setTimeout(()=> box.classList.remove("warn"), 1500);
+        }
+        e.target.value = after;
+
+        maybeStopTimerIfAllCorrect();
+      });
+    });
+
+    // 長押しでだけ答え表示
+    let savedQ = "";
+    let savedR = "";
+    let holding = false;
+    let pressTimer = null;
+    let pressStarted = false;
+
+    function showAnswer(){
+      if(holding) return;
+      holding = true;
+
+      savedQ = qInput.value;
+      savedR = rInput.value;
+
+      qInput.value = String(p.q);
+      rInput.value = String(p.r);
+
+      qInput.readOnly = true;
+      rInput.readOnly = true;
+
+      qBox.classList.add("revealing");
+      rBox.classList.add("revealing");
+    }
+
+    function hideAnswer(){
+      if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+      pressStarted = false;
+
+      if(!holding) return;
+      holding = false;
+
+      qInput.value = savedQ;
+      rInput.value = savedR;
+
+      qInput.readOnly = false;
+      rInput.readOnly = false;
+
+      qBox.classList.remove("revealing");
+      rBox.classList.remove("revealing");
+    }
+
+    function startPress(e){
+      e.preventDefault();
+      if(pressStarted) return;
+      pressStarted = true;
+
+      pressTimer = setTimeout(()=>{
+        pressTimer = null;
+        showAnswer();
+      }, LONG_PRESS_MS);
+    }
+
+    function cancelPress(e){
+      if(e) e.preventDefault?.();
+      hideAnswer();
+    }
+
+    holdBtn.addEventListener("mousedown", startPress);
+    window.addEventListener("mouseup", cancelPress);
+    holdBtn.addEventListener("mouseleave", cancelPress);
+
+    holdBtn.addEventListener("touchstart", startPress, {passive:false});
+    holdBtn.addEventListener("touchend", cancelPress, {passive:false});
+    holdBtn.addEventListener("touchcancel", cancelPress);
+  });
+
+  document.getElementById("score").textContent="点数：— / 100";
+}
+
+function maybeStopTimerIfAllCorrect(){
+  if(!timingEnabled) return;
+  if(tStart==null || tStop!=null) return;
+
+  const cards = Array.from(document.querySelectorAll(".q"));
+  if(cards.length===0) return;
+
+  for(let i=0;i<cards.length;i++){
+    const card = cards[i];
+    const uq = Number(card.querySelector(".ansQ").value);
+    const ur = Number(card.querySelector(".ansR").value);
+    if(uq !== problems[i].q || ur !== problems[i].r) return;
+  }
+  timerStop();
+}
+
+function check(){
+  let score=0;
+  document.querySelectorAll(".q").forEach((card,i)=>{
+    const qBox=card.querySelector(".ansQ").parentElement;
+    const rBox=card.querySelector(".ansR").parentElement;
+    qBox.classList.remove("ok");
+    rBox.classList.remove("ok");
+
+    const uq=Number(card.querySelector(".ansQ").value);
+    const ur=Number(card.querySelector(".ansR").value);
+
+    if(uq===problems[i].q) qBox.classList.add("ok");
+    if(ur===problems[i].r) rBox.classList.add("ok");
+    if(uq===problems[i].q && ur===problems[i].r) score+=10;
+  });
+  document.getElementById("score").textContent=`点数：${score} / 100`;
+
+  maybeStopTimerIfAllCorrect();
+}
+
+/* 手書き */
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
+let drawing=false, lastX=0, lastY=0, mode="pen";
+
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  const old = document.createElement("canvas");
+  old.width = canvas.width;
+  old.height = canvas.height;
+  old.getContext("2d").drawImage(canvas,0,0);
+
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  ctx.drawImage(old, 0, 0, old.width, old.height, 0, 0, rect.width, rect.height);
+  setPenStyle();
+}
+function setPenStyle(){
+  ctx.lineCap="round"; ctx.lineJoin="round";
+  if(mode==="pen"){
+    ctx.globalCompositeOperation="source-over";
+    ctx.lineWidth=4;
+    ctx.strokeStyle="#111827";
+  }else{
+    ctx.globalCompositeOperation="destination-out";
+    ctx.lineWidth=16;
+    ctx.strokeStyle="rgba(0,0,0,1)";
+  }
+}
+function getPos(e){
+  const r=canvas.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:null;
+  const cx=t?t.clientX:e.clientX;
+  const cy=t?t.clientY:e.clientY;
+  return {x:cx-r.left,y:cy-r.top};
+}
+function startDraw(e){
+  drawing=true;
+  const p=getPos(e); lastX=p.x; lastY=p.y;
+}
+function moveDraw(e){
+  if(!drawing) return;
+  e.preventDefault();
+  const p=getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(lastX,lastY);
+  ctx.lineTo(p.x,p.y);
+  ctx.stroke();
+  lastX=p.x; lastY=p.y;
+}
+function endDraw(){ drawing=false; }
+
+canvas.addEventListener("mousedown", startDraw);
+canvas.addEventListener("mousemove", moveDraw);
+window.addEventListener("mouseup", endDraw);
+
+canvas.addEventListener("touchstart", startDraw, {passive:false});
+canvas.addEventListener("touchmove", moveDraw, {passive:false});
+canvas.addEventListener("touchend", endDraw);
+canvas.addEventListener("touchcancel", endDraw);
+
+const penBtn=document.getElementById("penBtn");
+const eraserBtn=document.getElementById("eraserBtn");
+const clearBtn=document.getElementById("clearBtn");
+
+function setActive(btn){
+  [penBtn, eraserBtn].forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
+penBtn.addEventListener("click", ()=>{ mode="pen"; setActive(penBtn); setPenStyle(); });
+eraserBtn.addEventListener("click", ()=>{ mode="eraser"; setActive(eraserBtn); setPenStyle(); });
+clearBtn.addEventListener("click", ()=>{
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0,0,rect.width,rect.height);
+});
+
+/* 初期化 */
+document.getElementById("makeBtn").onclick=()=>{
+  problems=makeProblems();
+  render();
+  timerReset();
+  timerStart(); // 問題作成で自動スタート（ONのときだけ）
+};
+document.getElementById("checkBtn").onclick=check;
+
+problems=makeProblems();
+render();
+showBest();     // ベストは常に表示
+setTimingUI();  // タイム表示だけON/OFF
+
+setPenStyle();
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 </script>
 </body>
 </html>
