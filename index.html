@@ -43,18 +43,21 @@ body{
 }
 h1{ margin:0 0 8px; font-size:22px; }
 
+/* ===== 上部：1行 ===== */
 .controlsRow{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;         /* 1行固定 */
+  overflow-x:auto;          /* 狭い時は横スクロール */
+  -webkit-overflow-scrolling:touch;
 }
 .controlsLeft, .controlsRight{
   display:flex;
   gap:8px;
   align-items:center;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
 }
 
 button{
@@ -80,14 +83,13 @@ button:active{ transform: translateY(1px); }
   box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
-/* ===== タイム表示 ===== */
-.statusBar{
-  margin-top:10px;
+/* ===== タイム表示（上部1行内） ===== */
+.timerInline{
   display:flex;
   align-items:center;
-  justify-content:space-between;
   gap:10px;
-  flex-wrap:wrap;
+  flex:0 0 auto;
+  white-space:nowrap;
 }
 .timer{
   display:inline-flex;
@@ -110,6 +112,26 @@ button:active{ transform: translateY(1px); }
   font-weight:800;
   font-size:13px;
 }
+.timerOff{
+  display:none;
+}
+
+/* 計測ON/OFFスイッチ */
+.switch{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  white-space:nowrap;
+}
+.switch input{ accent-color: var(--accent); }
 
 /* ===== 問題 ===== */
 .grid{
@@ -301,23 +323,28 @@ button:active{ transform: translateY(1px); }
       <div class="top">
         <h1>あまりのある わり算（3年生）</h1>
 
+        <!-- ★ 1行：こたえあわせ / タイム+ヒント /（スイッチ）/ もんだいをつくる -->
         <div class="controlsRow">
           <div class="controlsLeft">
             <button class="primary" id="checkBtn">こたえあわせ</button>
           </div>
+
+          <div class="timerInline" id="timerInline">
+            <div class="timer" id="timerBox" aria-live="polite">
+              <span class="label">⏱ タイム</span>
+              <span class="value" id="timerText">0.0</span>
+              <span class="label">びょう</span>
+            </div>
+            <div class="hint" id="timerHint">「もんだいをつくる」でスタート</div>
+          </div>
+
           <div class="controlsRight">
+            <label class="switch" title="タイムを計測する/しない">
+              <input type="checkbox" id="timingToggle" checked>
+              タイム
+            </label>
             <button id="makeBtn">もんだいをつくる</button>
           </div>
-        </div>
-
-        <!-- 全問タイム（自動スタート/ストップ） -->
-        <div class="statusBar">
-          <div class="timer" id="timerBox" aria-live="polite">
-            <span class="label">⏱ タイム</span>
-            <span class="value" id="timerText">0.0</span>
-            <span class="label">びょう</span>
-          </div>
-          <div class="hint" id="timerHint">「もんだいをつくる」でスタート</div>
         </div>
       </div>
 
@@ -361,6 +388,11 @@ let problems=[];
 const QNUM=10;
 const LONG_PRESS_MS = 350;
 
+/* ===== タイム計測 ON/OFF ===== */
+let timingEnabled = true;
+const timingToggle = document.getElementById("timingToggle");
+const timerInline = document.getElementById("timerInline");
+
 /* ===== 全問タイマー（自動） ===== */
 let tStart = null;
 let tStop = null;
@@ -381,6 +413,7 @@ function timerReset(){
   if(tTick){ clearInterval(tTick); tTick = null; }
 }
 function timerStart(){
+  if(!timingEnabled) return;
   tStart = performance.now();
   tStop = null;
   timerBox.classList.add("running");
@@ -392,6 +425,7 @@ function timerStart(){
   }, 100);
 }
 function timerStop(){
+  if(!timingEnabled) return;
   if(tStart==null || tStop!=null) return;
   tStop = performance.now();
   timerText.textContent = fmtSec(tStop - tStart);
@@ -399,6 +433,18 @@ function timerStop(){
   timerHint.textContent = "🎉 おわり！もういちど は「もんだいをつくる」";
   if(tTick){ clearInterval(tTick); tTick = null; }
 }
+
+function setTimingUI(){
+  timingEnabled = timingToggle.checked;
+  if(timingEnabled){
+    timerInline.classList.remove("timerOff");
+    timerReset();
+  }else{
+    timerReset();
+    timerInline.classList.add("timerOff"); // 表示しない
+  }
+}
+timingToggle.addEventListener("change", setTimingUI);
 
 function makeProblems(){
   const out=[], set=new Set();
@@ -541,7 +587,9 @@ function render(){
 }
 
 function maybeStopTimerIfAllCorrect(){
+  if(!timingEnabled) return;
   if(tStart==null || tStop!=null) return;
+
   const cards = Array.from(document.querySelectorAll(".q"));
   if(cards.length===0) return;
 
@@ -659,13 +707,13 @@ document.getElementById("makeBtn").onclick=()=>{
   problems=makeProblems();
   render();
   timerReset();
-  timerStart(); // ★問題作成で自動スタート
+  timerStart(); // ★問題作成で自動スタート（ONのときだけ）
 };
 document.getElementById("checkBtn").onclick=check;
 
 problems=makeProblems();
 render();
-timerReset();
+setTimingUI();
 
 setPenStyle();
 resizeCanvas();
