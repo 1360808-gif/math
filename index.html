@@ -23,7 +23,7 @@ body{
 }
 .wrap{ max-width:1200px; margin:16px auto; padding:0 12px 40px; }
 
-/* 左：タイトル+問題 / 右：手書き（左の右端を揃え、余白は右が広がる） */
+/* 左：タイトル+問題 / 右：手書き */
 .layout{
   display:grid;
   grid-template-columns: minmax(560px, 760px) 1fr;
@@ -80,7 +80,38 @@ button:active{ transform: translateY(1px); }
   box-shadow:0 6px 12px rgba(0,0,0,.06);
 }
 
-/* 問題グリッド */
+/* ===== タイム表示 ===== */
+.statusBar{
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.timer{
+  display:inline-flex;
+  align-items:baseline;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#f8fafc;
+  font-weight:1000;
+}
+.timer .label{ font-size:13px; opacity:.85; }
+.timer .value{ font-size:20px; letter-spacing:.5px; }
+.timer.running{
+  border-color: rgba(79,70,229,.45);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+}
+.hint{
+  color:#6b7280;
+  font-weight:800;
+  font-size:13px;
+}
+
+/* ===== 問題 ===== */
 .grid{
   margin-top:12px;
   display:grid;
@@ -107,7 +138,6 @@ button:active{ transform: translateY(1px); }
   overflow:visible;
 }
 
-/* 丸が欠けないように visible */
 .qInline{
   display:flex;
   align-items:center;
@@ -115,7 +145,7 @@ button:active{ transform: translateY(1px); }
   flex:1;
   min-width:0;
   white-space:nowrap;
-  overflow:visible;
+  overflow:visible; /* hidden禁止：丸が欠ける */
 }
 
 .expr{
@@ -123,15 +153,12 @@ button:active{ transform: translateY(1px); }
   font-weight:1000;
 }
 
-/* 入力欄コンテナ */
 .answerBox{
   position:relative;
   display:inline-block;
   flex:none;
   overflow:visible;
 }
-
-/* 入力欄 */
 .answerBox input{
   width:54px;
   padding:6px 6px;
@@ -144,7 +171,6 @@ button:active{ transform: translateY(1px); }
   z-index:1;
 }
 
-/* 半角注意メッセージ */
 .hankakuWarn{
   position:absolute;
   top:-26px;
@@ -163,7 +189,6 @@ button:active{ transform: translateY(1px); }
 }
 .answerBox.warn .hankakuWarn{ display:block; }
 
-/* 正答の丸（最前面） */
 .mark{
   position:absolute;
   top:50%;
@@ -179,7 +204,6 @@ button:active{ transform: translateY(1px); }
 }
 .answerBox.ok .mark{ display:block; }
 
-/* 長押しで答え表示中 */
 .answerBox.revealing input{ background:#f8fafc; }
 
 .remLabel{
@@ -188,7 +212,7 @@ button:active{ transform: translateY(1px); }
   opacity:.85;
 }
 
-/* 小さい2行ボタン */
+/* こたえをみる（2行） */
 .smallBtn{
   width:60px;
   height:38px;
@@ -222,7 +246,7 @@ button:active{ transform: translateY(1px); }
   font-size:18px;
 }
 
-/* 手書き */
+/* ===== 手書き ===== */
 .boardHeader{
   display:flex;
   align-items:center;
@@ -288,6 +312,16 @@ button:active{ transform: translateY(1px); }
             <button id="makeBtn">もんだいをつくる</button>
           </div>
         </div>
+
+        <!-- ★ 全問タイム -->
+        <div class="statusBar">
+          <div class="timer" id="timerBox" aria-live="polite">
+            <span class="label">⏱ タイム</span>
+            <span class="value" id="timerText">0.0</span>
+            <span class="label">びょう</span>
+          </div>
+          <div class="hint" id="timerHint">「もんだいをつくる」でスタート</div>
+        </div>
       </div>
 
       <div class="panel" style="margin-top:12px;">
@@ -328,7 +362,49 @@ function rand(min,max){
 
 let problems=[];
 const QNUM=10;
-const LONG_PRESS_MS = 350; // ★長押し判定（ミリ秒）
+const LONG_PRESS_MS = 350;
+
+/* ===== 全問タイマー ===== */
+let tStart = null;
+let tStop = null;
+let tTick = null;
+
+const timerBox = document.getElementById("timerBox");
+const timerText = document.getElementById("timerText");
+const timerHint = document.getElementById("timerHint");
+
+function fmtSec(ms){
+  return (ms/1000).toFixed(1);
+}
+function timerReset(){
+  tStart = null;
+  tStop = null;
+  timerText.textContent = "0.0";
+  timerBox.classList.remove("running");
+  timerHint.textContent = "「もんだいをつくる」でスタート";
+  if(tTick){ clearInterval(tTick); tTick = null; }
+}
+function timerStart(){
+  tStart = performance.now();
+  tStop = null;
+  timerBox.classList.add("running");
+  timerHint.textContent = "ぜんぶ せいかい でストップ！";
+  if(tTick) clearInterval(tTick);
+  tTick = setInterval(()=>{
+    if(tStart==null || tStop!=null) return;
+    const ms = performance.now() - tStart;
+    timerText.textContent = fmtSec(ms);
+  }, 100);
+}
+function timerStop(){
+  if(tStart==null || tStop!=null) return;
+  tStop = performance.now();
+  const ms = tStop - tStart;
+  timerText.textContent = fmtSec(ms);
+  timerBox.classList.remove("running");
+  timerHint.textContent = "🎉 おわり！もういちど は「もんだいをつくる」";
+  if(tTick){ clearInterval(tTick); tTick = null; }
+}
 
 function makeProblems(){
   const out=[], set=new Set();
@@ -396,6 +472,9 @@ function render(){
           box._warnTimer = setTimeout(()=> box.classList.remove("warn"), 1500);
         }
         e.target.value = after;
+
+        // ★ 入力が変わったら、全問正解かチェック（正解になった瞬間にタイム停止）
+        maybeStopTimerIfAllCorrect();
       });
     });
 
@@ -424,7 +503,6 @@ function render(){
     }
 
     function hideAnswer(){
-      // タイマーだけ動いてて、まだ表示してないケースもあるので全部止める
       if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
       pressStarted = false;
 
@@ -442,10 +520,7 @@ function render(){
     }
 
     function startPress(e){
-      // クリック等の誤動作を抑える
       e.preventDefault();
-
-      // 二重起動防止
       if(pressStarted) return;
       pressStarted = true;
 
@@ -460,21 +535,35 @@ function render(){
       hideAnswer();
     }
 
-    // PC（マウス）
     holdBtn.addEventListener("mousedown", startPress);
     window.addEventListener("mouseup", cancelPress);
     holdBtn.addEventListener("mouseleave", cancelPress);
 
-    // スマホ（タッチ）
     holdBtn.addEventListener("touchstart", startPress, {passive:false});
     holdBtn.addEventListener("touchend", cancelPress, {passive:false});
     holdBtn.addEventListener("touchcancel", cancelPress);
-
-    // キーボード操作（アクセシビリティ）：長押し相当は難しいので、Enter/Spaceは何もしない
-    // もし必要なら「スペース押している間だけ」にも拡張できます。
   });
 
   document.getElementById("score").textContent="点数：— / 100";
+}
+
+/* 全問が正解ならタイム停止（＋点数表示にも反映） */
+function maybeStopTimerIfAllCorrect(){
+  // タイマーが動いてないならチェックしない（無駄を省く）
+  if(tStart==null || tStop!=null) return;
+
+  const cards = Array.from(document.querySelectorAll(".q"));
+  if(cards.length === 0) return;
+
+  for(let i=0;i<cards.length;i++){
+    const card = cards[i];
+    const uq = Number(card.querySelector(".ansQ").value);
+    const ur = Number(card.querySelector(".ansR").value);
+    if(uq !== problems[i].q || ur !== problems[i].r){
+      return; // 1つでも違えば未達
+    }
+  }
+  timerStop();
 }
 
 function check(){
@@ -493,6 +582,9 @@ function check(){
     if(uq===problems[i].q && ur===problems[i].r) score+=10;
   });
   document.getElementById("score").textContent=`点数：${score} / 100`;
+
+  // こたえあわせ押した時も、全問正解なら止める
+  maybeStopTimerIfAllCorrect();
 }
 
 /* 手書き */
@@ -579,11 +671,14 @@ clearBtn.addEventListener("click", ()=>{
 document.getElementById("makeBtn").onclick=()=>{
   problems=makeProblems();
   render();
+  timerReset();
+  timerStart(); // ★新しい問題で自動スタート
 };
 document.getElementById("checkBtn").onclick=check;
 
 problems=makeProblems();
 render();
+timerReset();
 
 setPenStyle();
 resizeCanvas();
