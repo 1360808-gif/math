@@ -97,17 +97,17 @@ button:active{ transform: translateY(1px); }
   border-radius:18px;
   padding:12px;
   box-shadow:0 6px 12px rgba(0,0,0,.06);
-  overflow:visible; /* ★丸を切らない */
+  overflow:visible; /* 丸を切らない */
 }
 
 .qRow{
   display:flex;
   align-items:center;
   gap:10px;
-  overflow:visible; /* ★丸を切らない */
+  overflow:visible;
 }
 
-/* ★ここが “欠け” の原因だったので visible */
+/* 丸が欠けないように visible */
 .qInline{
   display:flex;
   align-items:center;
@@ -115,7 +115,7 @@ button:active{ transform: translateY(1px); }
   flex:1;
   min-width:0;
   white-space:nowrap;
-  overflow:visible; /* ★hidden禁止 */
+  overflow:visible;
 }
 
 .expr{
@@ -128,7 +128,7 @@ button:active{ transform: translateY(1px); }
   position:relative;
   display:inline-block;
   flex:none;
-  overflow:visible; /* ★丸を切らない */
+  overflow:visible;
 }
 
 /* 入力欄 */
@@ -163,7 +163,7 @@ button:active{ transform: translateY(1px); }
 }
 .answerBox.warn .hankakuWarn{ display:block; }
 
-/* ✅ 正答の丸（最前面・欠けない） */
+/* 正答の丸（最前面） */
 .mark{
   position:absolute;
   top:50%;
@@ -179,7 +179,7 @@ button:active{ transform: translateY(1px); }
 }
 .answerBox.ok .mark{ display:block; }
 
-/* 押してる間の答え表示中 */
+/* 長押しで答え表示中 */
 .answerBox.revealing input{ background:#f8fafc; }
 
 .remLabel{
@@ -188,7 +188,7 @@ button:active{ transform: translateY(1px); }
   opacity:.85;
 }
 
-/* 小さい2行ボタン（ここが「2行表示」） */
+/* 小さい2行ボタン */
 .smallBtn{
   width:60px;
   height:38px;
@@ -202,6 +202,7 @@ button:active{ transform: translateY(1px); }
   padding:0;
   user-select:none;
   -webkit-user-select:none;
+  touch-action:manipulation;
 }
 .smallBtn span{
   display:block;
@@ -221,7 +222,7 @@ button:active{ transform: translateY(1px); }
   font-size:18px;
 }
 
-/* ===== 手書き ===== */
+/* 手書き */
 .boardHeader{
   display:flex;
   align-items:center;
@@ -309,7 +310,7 @@ button:active{ transform: translateY(1px); }
         <canvas id="board"></canvas>
       </div>
 
-      <div class="boardHint">※ 指でも書けます。消しゴムは「消しゴム」ボタンで切り替え。</div>
+      <div class="boardHint">※ 「こたえをみる」は長押ししているあいだだけ見えます。</div>
     </div>
 
   </div>
@@ -327,6 +328,8 @@ function rand(min,max){
 
 let problems=[];
 const QNUM=10;
+const LONG_PRESS_MS = 350; // ★長押し判定（ミリ秒）
+
 function makeProblems(){
   const out=[], set=new Set();
   while(out.length<QNUM){
@@ -366,7 +369,7 @@ function render(){
           </span>
         </div>
 
-        <button class="smallBtn holdAnsBtn" type="button" aria-label="こたえをみる（おしているあいだ）">
+        <button class="smallBtn holdAnsBtn" type="button" aria-label="こたえをみる（ながおし）">
           <span>こたえを</span>
           <span>みる</span>
         </button>
@@ -396,10 +399,12 @@ function render(){
       });
     });
 
-    // ✅ 押している間だけ答えを入力欄に表示（元の入力は保持）
+    // 長押しでだけ答え表示
     let savedQ = "";
     let savedR = "";
     let holding = false;
+    let pressTimer = null;
+    let pressStarted = false;
 
     function showAnswer(){
       if(holding) return;
@@ -411,7 +416,6 @@ function render(){
       qInput.value = String(p.q);
       rInput.value = String(p.r);
 
-      // 誤操作防止
       qInput.readOnly = true;
       rInput.readOnly = true;
 
@@ -420,6 +424,10 @@ function render(){
     }
 
     function hideAnswer(){
+      // タイマーだけ動いてて、まだ表示してないケースもあるので全部止める
+      if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+      pressStarted = false;
+
       if(!holding) return;
       holding = false;
 
@@ -433,17 +441,37 @@ function render(){
       rBox.classList.remove("revealing");
     }
 
-    // マウス：押したら表示、離したら戻す
-    holdBtn.addEventListener("mousedown", (e)=>{ e.preventDefault(); showAnswer(); });
-    window.addEventListener("mouseup", hideAnswer);
+    function startPress(e){
+      // クリック等の誤動作を抑える
+      e.preventDefault();
 
-    // タッチ：押したら表示、離したら戻す（スマホ対応）
-    holdBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); showAnswer(); }, {passive:false});
-    holdBtn.addEventListener("touchend", (e)=>{ e.preventDefault(); hideAnswer(); }, {passive:false});
-    holdBtn.addEventListener("touchcancel", hideAnswer);
+      // 二重起動防止
+      if(pressStarted) return;
+      pressStarted = true;
 
-    // ふいに外れた時の保険
-    holdBtn.addEventListener("mouseleave", hideAnswer);
+      pressTimer = setTimeout(()=>{
+        pressTimer = null;
+        showAnswer();
+      }, LONG_PRESS_MS);
+    }
+
+    function cancelPress(e){
+      if(e) e.preventDefault?.();
+      hideAnswer();
+    }
+
+    // PC（マウス）
+    holdBtn.addEventListener("mousedown", startPress);
+    window.addEventListener("mouseup", cancelPress);
+    holdBtn.addEventListener("mouseleave", cancelPress);
+
+    // スマホ（タッチ）
+    holdBtn.addEventListener("touchstart", startPress, {passive:false});
+    holdBtn.addEventListener("touchend", cancelPress, {passive:false});
+    holdBtn.addEventListener("touchcancel", cancelPress);
+
+    // キーボード操作（アクセシビリティ）：長押し相当は難しいので、Enter/Spaceは何もしない
+    // もし必要なら「スペース押している間だけ」にも拡張できます。
   });
 
   document.getElementById("score").textContent="点数：— / 100";
