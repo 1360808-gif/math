@@ -23,7 +23,7 @@ body{
 }
 .wrap{ max-width:1200px; margin:16px auto; padding:0 12px 40px; }
 
-/* ===== レイアウト ===== */
+/* レイアウト */
 .layout{
   display:grid;
   grid-template-columns: minmax(560px, 760px) 1fr;
@@ -33,6 +33,7 @@ body{
   .layout{ grid-template-columns:1fr; }
 }
 
+/* 上部 */
 .top{
   background:#fff;
   border:1px solid var(--line);
@@ -41,15 +42,14 @@ body{
   box-shadow:var(--shadow);
 }
 
-/* ===== タイトル行（ベストタイムを右） ===== */
+/* ===== タイトル行 ===== */
 .titleRow{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  flex-wrap:wrap;
 }
-h1{
+.titleRow h1{
   margin:0;
   font-size:22px;
   white-space:nowrap;
@@ -58,9 +58,9 @@ h1{
 /* ベストタイム */
 .bestBox{
   display:inline-flex;
-  align-items:baseline;
+  align-items:center;
   gap:8px;
-  padding:6px 12px;
+  padding:8px 12px;
   border-radius:14px;
   border:1px dashed rgba(79,70,229,.5);
   background:#fbfbff;
@@ -68,22 +68,17 @@ h1{
   white-space:nowrap;
 }
 .bestBox .label{ font-size:13px; opacity:.85; }
-.bestBox .value{ font-size:20px; letter-spacing:.3px; }
+.bestBox .value{ font-size:18px; }
+.bestOff{ display:none; }
 
-/* ===== 上部操作行 ===== */
+/* 操作行 */
 .controlsRow{
-  margin-top:8px;
+  margin-top:10px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  flex-wrap:nowrap;
   overflow-x:auto;
-}
-.controlsLeft,.controlsRight{
-  display:flex;
-  gap:8px;
-  align-items:center;
 }
 
 button{
@@ -96,20 +91,18 @@ button{
 }
 button.primary{
   background:var(--accent);
-  color:#fff;
   border-color:transparent;
+  color:#fff;
 }
 
-/* ===== タイム ===== */
+/* タイム */
 .timerInline{
   display:flex;
   align-items:center;
   gap:10px;
-  white-space:nowrap;
 }
 .timer{
-  display:inline-flex;
-  align-items:baseline;
+  display:flex;
   gap:8px;
   padding:8px 12px;
   border-radius:14px;
@@ -117,7 +110,6 @@ button.primary{
   background:#f8fafc;
   font-weight:1000;
 }
-.timer .value{ font-size:20px; }
 .timer.running{
   border-color:rgba(79,70,229,.45);
   box-shadow:0 0 0 3px rgba(79,70,229,.12);
@@ -127,15 +119,15 @@ button.primary{
   font-weight:800;
   color:#6b7280;
 }
+.timerOff{ display:none; }
 
-/* ===== 問題 ===== */
+/* 問題 */
 .panel{
-  margin-top:12px;
   background:#fff;
   border:1px solid var(--line);
   border-radius:18px;
   padding:14px;
-  box-shadow:0 6px 12px rgba(0,0,0,.06);
+  margin-top:12px;
 }
 .grid{
   display:grid;
@@ -147,20 +139,13 @@ button.primary{
 }
 .q{
   border:1px solid var(--line);
-  border-radius:16px;
+  border-radius:18px;
   padding:12px;
 }
 .qRow{
   display:flex;
   align-items:center;
   gap:10px;
-}
-.qInline{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex:1;
-  white-space:nowrap;
 }
 .expr{ font-weight:1000; font-size:18px; }
 
@@ -170,13 +155,13 @@ button.primary{
 .answerBox input{
   width:54px;
   text-align:center;
-  font-size:17px;
   border-radius:10px;
   border:2px solid var(--line);
+  font-size:16px;
 }
 .mark{
   position:absolute;
-  inset:-6px;
+  inset:-8px;
   border:4px solid rgba(239,68,68,.7);
   border-radius:50%;
   display:none;
@@ -184,35 +169,24 @@ button.primary{
 }
 .answerBox.ok .mark{ display:block; }
 
-.smallBtn{
-  width:60px;
-  height:38px;
-  border-radius:12px;
-  font-size:12px;
-  font-weight:900;
+.score{
+  margin-top:12px;
+  font-size:18px;
+  font-weight:1000;
 }
-
-/* ===== 手書き ===== */
-.canvasWrap{
-  border:2px dashed #cbd5e1;
-  border-radius:16px;
-  height:640px;
-}
-#board{ width:100%; height:100%; }
 </style>
 </head>
 
 <body>
 <div class="wrap">
   <div class="layout">
-
     <div>
-      <div class="top">
 
-        <!-- ★ タイトル＋ベストタイム -->
+      <div class="top">
         <div class="titleRow">
           <h1>あまりのある わり算（3年生）</h1>
-          <div class="bestBox">
+
+          <div class="bestBox" id="bestInline">
             <span class="label">🏆 ベスト</span>
             <span class="value" id="bestText">—</span>
             <span class="label">びょう</span>
@@ -220,41 +194,33 @@ button.primary{
         </div>
 
         <div class="controlsRow">
-          <div class="controlsLeft">
-            <button class="primary" id="checkBtn">こたえあわせ</button>
-          </div>
+          <button class="primary" id="checkBtn">こたえあわせ</button>
 
-          <div class="timerInline">
+          <div class="timerInline" id="timerInline">
             <div class="timer" id="timerBox">
-              ⏱ <span class="value" id="timerText">0.0</span>びょう
+              ⏱ <span id="timerText">0.0</span>びょう
             </div>
-            <div class="hint" id="timerHint">「もんだいをつくる」でスタート</div>
+            <div class="hint" id="timerHint">
+              「もんだいをつくる」でスタート
+            </div>
           </div>
 
-          <div class="controlsRight">
-            <button id="makeBtn">もんだいをつくる</button>
-          </div>
+          <button id="makeBtn">もんだいをつくる</button>
         </div>
       </div>
 
       <div class="panel">
         <div class="grid" id="qs"></div>
+        <div class="score" id="score">点数：— / 100</div>
       </div>
     </div>
-
-    <div class="panel">
-      <div class="canvasWrap">
-        <canvas id="board"></canvas>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <script>
-/* ===== ベストタイム ===== */
-const BEST_KEY="warizan_best_sec_v1";
+const BEST_KEY="warizan_best";
 const bestText=document.getElementById("bestText");
+
 function loadBest(){
   const v=localStorage.getItem(BEST_KEY);
   return v?Number(v):null;
@@ -263,34 +229,42 @@ function showBest(){
   const b=loadBest();
   bestText.textContent=b?b.toFixed(1):"—";
 }
-function tryUpdateBest(sec){
+function updateBest(sec){
   const b=loadBest();
-  if(!b||sec<b) localStorage.setItem(BEST_KEY,sec);
-  showBest();
+  if(b===null||sec<b){
+    localStorage.setItem(BEST_KEY,sec);
+    showBest();
+  }
 }
 
-/* ===== タイマー ===== */
-let tStart=null,tick=null;
-const timerBox=document.getElementById("timerBox");
+let start=null,tick=null;
 const timerText=document.getElementById("timerText");
+const timerBox=document.getElementById("timerBox");
 const timerHint=document.getElementById("timerHint");
 
 function startTimer(){
-  tStart=performance.now();
+  start=performance.now();
   timerBox.classList.add("running");
+  timerHint.textContent="ぜんぶ せいかい でストップ！";
   tick=setInterval(()=>{
-    timerText.textContent=((performance.now()-tStart)/1000).toFixed(1);
+    timerText.textContent=((performance.now()-start)/1000).toFixed(1);
   },100);
 }
 function stopTimer(){
   clearInterval(tick);
   timerBox.classList.remove("running");
-  const sec=(performance.now()-tStart)/1000;
+  const sec=(performance.now()-start)/1000;
   timerText.textContent=sec.toFixed(1);
-  tryUpdateBest(sec);
+  updateBest(sec);
 }
 
-/* ===== 初期 ===== */
+document.getElementById("makeBtn").onclick=()=>{
+  startTimer();
+};
+document.getElementById("checkBtn").onclick=()=>{
+  stopTimer();
+};
+
 showBest();
 </script>
 </body>
